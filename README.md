@@ -171,6 +171,93 @@ with CopilotClient(token) as client:
 - `copilot_fetcher.api` - GitHub Copilot API client
 - `copilot_fetcher.storage` - Local data storage
 
+## GitHub Actions Automation
+
+You can automatically fetch Copilot models daily using GitHub Actions.
+
+### Setup
+
+1. **Create a Personal Access Token**:
+   - Go to https://github.com/settings/tokens
+   - Click "Generate new token (classic)"
+   - Select scopes: `repo`, `read:user`
+   - Copy the generated token
+
+2. **Add Token to Repository Secrets**:
+   - Go to your repository on GitHub
+   - Navigate to Settings → Secrets and variables → Actions
+   - Click "New repository secret"
+   - Name: `GH_TOKEN`
+   - Value: Your personal access token from step 1
+   - Click "Add secret"
+
+3. **Enable GitHub Actions**:
+   - The workflow file `.github/workflows/daily-fetch.yml` is already included
+   - Actions will run automatically at 00:00 UTC every day
+   - You can also trigger manually from Actions tab
+
+### What the Workflow Does
+
+- **Schedule**: Runs daily at 00:00 UTC (configurable in the workflow)
+- **Manual Trigger**: Can be triggered manually from GitHub Actions tab
+- **Output**:
+  - Commits models to the `release` branch
+  - Creates/updates a GitHub Release with model snapshots
+  - Archives dated snapshots for historical tracking
+
+### Workflow Configuration
+
+The workflow is defined in `.github/workflows/daily-fetch.yml`:
+
+```yaml
+name: Daily Copilot Models Fetch
+
+on:
+  schedule:
+    - cron: '0 0 * * *'  # Daily at 00:00 UTC
+  workflow_dispatch:     # Allow manual trigger
+
+jobs:
+  fetch-models:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    
+    - name: Install dependencies
+      run: pip install -e .
+    
+    - name: Fetch Copilot models
+      env:
+        GH_TOKEN: ${{ secrets.GH_TOKEN }}
+      run: python -m copilot_fetcher fetch
+    
+    - name: Commit to release branch
+      run: |
+        # Commits models to release branch
+        # Creates dated snapshots
+    
+    - name: Create Release
+      run: |
+        # Creates GitHub Release with model files
+```
+
+### Environment Variables
+
+The tool supports two authentication methods:
+
+| Method | Environment Variable | Use Case |
+|--------|---------------------|----------|
+| GitHub CLI Token | `gh auth token` | Local development |
+| Personal Access Token | `GH_TOKEN` | GitHub Actions, CI/CD |
+
+For GitHub Actions, set `GH_TOKEN` in your repository secrets.
+
 ## Troubleshooting
 
 ### "GitHub CLI is not authenticated"
@@ -183,12 +270,28 @@ gh auth login
 
 Install GitHub CLI: https://cli.github.com/
 
+Or use environment variable authentication:
+
+```bash
+export GH_TOKEN="your_github_token"
+python -m copilot_fetcher fetch
+```
+
 ### "No models found"
 
 Run fetch command:
 
 ```bash
 ./run.sh fetch
+```
+
+### GitHub Actions "Resource not accessible"
+
+Ensure the workflow has proper permissions:
+
+```yaml
+permissions:
+  contents: write
 ```
 
 ## Project Structure

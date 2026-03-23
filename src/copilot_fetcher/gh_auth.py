@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 import subprocess
 from dataclasses import dataclass
 
@@ -20,7 +21,38 @@ class GHAuthToken:
     source: str = "gh_cli"
 
 
+def get_token_from_env() -> str | None:
+    """Get token from environment variable.
+
+    Returns:
+        Token string if GH_TOKEN is set, None otherwise
+    """
+    return os.environ.get("GH_TOKEN")
+
+
 def get_gh_token() -> str:
+    """Get authentication token from GitHub CLI or environment.
+
+    Priority:
+    1. GH_TOKEN environment variable (for CI/GitHub Actions)
+    2. gh CLI auth token (for local development)
+
+    Returns:
+        GitHub token string
+
+    Raises:
+        GitHubCLIError: If no token is available
+    """
+    # First try environment variable (for GitHub Actions)
+    env_token = get_token_from_env()
+    if env_token:
+        return env_token
+
+    # Fall back to gh CLI
+    return get_gh_token_from_cli()
+
+
+def get_gh_token_from_cli() -> str:
     """Get authentication token from GitHub CLI.
 
     Returns:
@@ -43,7 +75,8 @@ def get_gh_token() -> str:
         raise GitHubCLIError(
             "GitHub CLI (gh) is not installed.\n"
             "Install from: https://cli.github.com/\n"
-            "Then run: gh auth login"
+            "Then run: gh auth login\n\n"
+            "Or set GH_TOKEN environment variable."
         )
 
     # Get token from gh CLI
@@ -55,11 +88,19 @@ def get_gh_token() -> str:
             timeout=10,
         )
         if result.returncode != 0:
-            raise GitHubCLIError("GitHub CLI is not authenticated.\nPlease run: gh auth login")
+            raise GitHubCLIError(
+                "GitHub CLI is not authenticated.\n"
+                "Please run: gh auth login\n\n"
+                "Or set GH_TOKEN environment variable."
+            )
 
         token = result.stdout.strip()
         if not token:
-            raise GitHubCLIError("GitHub CLI returned empty token")
+            raise GitHubCLIError(
+                "GitHub CLI returned empty token.\n"
+                "Please run: gh auth login\n\n"
+                "Or set GH_TOKEN environment variable."
+            )
 
         return token
     except subprocess.TimeoutExpired:
@@ -71,9 +112,15 @@ def get_gh_token() -> str:
 def check_gh_auth() -> tuple[bool, str]:
     """Check if gh CLI is installed and authenticated.
 
+    Also checks for GH_TOKEN environment variable.
+
     Returns:
         Tuple of (is_available, message)
     """
+    # Check for GH_TOKEN first
+    if get_token_from_env():
+        return True, "GH_TOKEN environment variable is set"
+
     # Check if gh is installed
     try:
         result = subprocess.run(
@@ -85,7 +132,7 @@ def check_gh_auth() -> tuple[bool, str]:
         if result.returncode != 0:
             return False, "GitHub CLI (gh) not found"
     except FileNotFoundError:
-        return False, "GitHub CLI (gh) not found"
+        return False, "GitHub CLI (gh) not found and GH_TOKEN not set"
     except Exception as e:
         return False, f"Error checking gh CLI: {e}"
 

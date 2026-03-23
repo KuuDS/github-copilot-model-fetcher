@@ -1,0 +1,90 @@
+name: Daily Copilot Models Fetch
+
+on:
+  schedule:
+    # Run at 00:00 UTC every day
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+    # Allow manual trigger
+
+jobs:
+  fetch-models:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    
+    - name: Install dependencies
+      run: |
+        pip install -e .
+    
+    - name: Fetch Copilot models
+      env:
+        GH_TOKEN: ${{ secrets.GH_TOKEN }}
+      run: |
+        python -m copilot_fetcher fetch
+    
+    - name: Copy models to repository
+      run: |
+        mkdir -p models
+        cp ~/.copilot-fetcher/models.json models/copilot-models.json
+        cp ~/.copilot-fetcher/models.json models/copilot-models-$(date +%Y-%m-%d).json
+    
+    - name: Create or update release branch
+      run: |
+        git config --local user.email "github-actions[bot]@users.noreply.github.com"
+        git config --local user.name "github-actions[bot]"
+        
+        # Fetch all branches
+        git fetch origin
+        
+        # Check if release branch exists
+        if git show-ref --verify --quiet refs/remotes/origin/release; then
+          # Checkout existing release branch
+          git checkout release
+          git pull origin release
+        else
+          # Create new release branch from main
+          git checkout -b release
+        fi
+        
+        # Add and commit models
+        git add models/
+        
+        # Only commit if there are changes
+        if git diff --cached --quiet; then
+          echo "No changes to commit"
+        else
+          git commit -m "Update Copilot models - $(date +%Y-%m-%d %H:%M:%S UTC)"
+          git push origin release
+        fi
+    
+    - name: Create Release
+      if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        DATE=$(date +%Y-%m-%d)
+        
+        # Check if release already exists
+        if gh release view "v$DATE" &>/dev/null; then
+          echo "Release v$DATE already exists, updating..."
+          gh release upload "v$DATE" models/copilot-models.json --clobber
+        else
+          # Create new release
+          gh release create "v$DATE" \
+            --title "Copilot Models - $DATE" \
+            --notes "Daily snapshot of GitHub Copilot available models" \
+            models/copilot-models.json \
+            models/copilot-models-$DATE.json
+        fi
