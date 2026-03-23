@@ -130,10 +130,10 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "This is expected when using Personal Access Token in GitHub Actions." >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Reason:** GitHub Copilot API requires interactive authentication via 'gh auth login'" >> $GITHUB_STEP_SUMMARY
+          echo "**Reason:** GitHub Copilot API requires interactive authentication via gh auth login" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Alternatives:**" >> $GITHUB_STEP_SUMMARY
           echo "1. Use local scheduling (cron, systemd, launchd)" >> $GITHUB_STEP_SUMMARY
           echo "2. Use self-hosted runner with pre-authenticated gh CLI" >> $GITHUB_STEP_SUMMARY
-          echo "3. Run manually: \\"gh auth login && ./run.sh fetch\\"" >> $GITHUB_STEP_SUMMARY
+          echo "3. Run manually: gh auth login && ./run.sh fetch" >> $GITHUB_STEP_SUMMARY
         fi
