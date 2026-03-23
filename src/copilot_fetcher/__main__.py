@@ -8,11 +8,11 @@ from datetime import datetime
 from pathlib import Path
 
 from copilot_fetcher.api import CopilotClient, CopilotAPIError
-from copilot_fetcher.gh_auth import check_gh_auth, get_gh_token, GitHubCLIError
+from copilot_fetcher.gh_auth import check_gh_auth, get_gh_token, get_token_from_env, GitHubCLIError
 from copilot_fetcher.storage import Storage, StoredToken
 
 
-def get_access_token(storage: Storage, force: bool = False) -> str:
+def get_access_token(storage: Storage, force: bool = False) -> str | None:
     """Get access token from GitHub CLI.
 
     Args:
@@ -20,7 +20,7 @@ def get_access_token(storage: Storage, force: bool = False) -> str:
         force: Force re-authentication
 
     Returns:
-        Access token string
+        Access token string or None if using gh CLI api
 
     Raises:
         SystemExit: If gh CLI is not available
@@ -32,6 +32,13 @@ def get_access_token(storage: Storage, force: bool = False) -> str:
             print(f"Using stored token (created: {stored.created_at})")
             return stored.access_token
 
+    # Check if GH_TOKEN is set (for GitHub Actions)
+    env_token = get_token_from_env()
+    if env_token:
+        print("✓ Using GH_TOKEN environment variable")
+        # Don't store env token, it's temporary
+        return env_token
+
     # Use gh CLI
     gh_available, gh_message = check_gh_auth()
     if not gh_available:
@@ -39,7 +46,7 @@ def get_access_token(storage: Storage, force: bool = False) -> str:
         print("\nTo use this tool, install GitHub CLI and authenticate:")
         print("  1. Install: https://cli.github.com/")
         print("  2. Run: gh auth login")
-        print("\nThis tool requires GitHub CLI to access the full Copilot model list.")
+        print("\nOr set GH_TOKEN environment variable.")
         sys.exit(1)
 
     try:
@@ -62,11 +69,11 @@ def get_access_token(storage: Storage, force: bool = False) -> str:
         sys.exit(1)
 
 
-def fetch_models(access_token: str, storage: Storage) -> None:
+def fetch_models(access_token: str | None, storage: Storage) -> None:
     """Fetch and save Copilot models.
 
     Args:
-        access_token: OAuth access token
+        access_token: OAuth access token or None to use gh CLI api
         storage: Storage instance
     """
     print("\nFetching Copilot models...")
