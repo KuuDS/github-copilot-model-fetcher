@@ -9,17 +9,11 @@ from pathlib import Path
 
 from copilot_fetcher.api import CopilotClient, CopilotAPIError
 from copilot_fetcher.gh_auth import check_gh_auth, get_gh_token, GitHubCLIError
-from copilot_fetcher.oauth import GitHubDeviceFlow, GitHubOAuthError, TokenResponse
 from copilot_fetcher.storage import Storage, StoredToken
 
 
 def get_access_token(storage: Storage, force: bool = False) -> str:
-    """Get access token using best available method.
-
-    Priority:
-    1. Use gh CLI token (recommended - provides full model list)
-    2. Use stored OAuth token
-    3. Perform OAuth Device Flow
+    """Get access token from GitHub CLI.
 
     Args:
         storage: Storage instance
@@ -27,6 +21,9 @@ def get_access_token(storage: Storage, force: bool = False) -> str:
 
     Returns:
         Access token string
+
+    Raises:
+        SystemExit: If gh CLI is not available
     """
     # Check for stored token unless forcing re-auth
     if not force:
@@ -35,59 +32,34 @@ def get_access_token(storage: Storage, force: bool = False) -> str:
             print(f"Using stored token (created: {stored.created_at})")
             return stored.access_token
 
-    # Try gh CLI first (preferred)
+    # Use gh CLI
     gh_available, gh_message = check_gh_auth()
-    if gh_available:
-        try:
-            token = get_gh_token()
-            print("✓ Using GitHub CLI (gh) authentication")
-            print("  This provides access to the full model list (35+ models)")
-
-            # Save token for reuse
-            stored_token = StoredToken(
-                access_token=token,
-                token_type="bearer",
-                scope="",
-                created_at=datetime.now().isoformat(),
-            )
-            storage.save_token(stored_token)
-
-            return token
-        except GitHubCLIError as e:
-            print(f"Note: {e}")
-            print("Falling back to OAuth authentication...\n")
-
-    # Fall back to OAuth Device Flow
-    print("Using OAuth Device Flow authentication")
-    print("Note: This may return a limited model list (7 models)")
-    print("For full access, install gh CLI: https://cli.github.com/\n")
-
-    client_id = input("Enter your GitHub OAuth App Client ID: ").strip()
-    if not client_id:
-        print("Error: Client ID is required")
+    if not gh_available:
+        print(f"Error: {gh_message}")
+        print("\nTo use this tool, install GitHub CLI and authenticate:")
+        print("  1. Install: https://cli.github.com/")
+        print("  2. Run: gh auth login")
+        print("\nThis tool requires GitHub CLI to access the full Copilot model list.")
         sys.exit(1)
-
-    flow = GitHubDeviceFlow(client_id)
 
     try:
-        token_response = flow.authenticate(open_browser=True)
-    except GitHubOAuthError as e:
-        print(f"Authentication failed: {e}")
+        token = get_gh_token()
+        print("✓ Using GitHub CLI (gh) authentication")
+        print("  Accessing full Copilot model list (35+ models)")
+
+        # Save token for reuse
+        stored_token = StoredToken(
+            access_token=token,
+            token_type="bearer",
+            scope="",
+            created_at=datetime.now().isoformat(),
+        )
+        storage.save_token(stored_token)
+
+        return token
+    except GitHubCLIError as e:
+        print(f"Error: {e}")
         sys.exit(1)
-
-    # Save token
-    stored_token = StoredToken(
-        access_token=token_response.access_token,
-        token_type=token_response.token_type,
-        scope=token_response.scope,
-        created_at=datetime.now().isoformat(),
-    )
-    storage.save_token(stored_token)
-
-    print(f"\n✓ Authentication successful!")
-    print(f"✓ Token saved to: {storage.token_file}")
-
-    return token_response.access_token
 
 
 def fetch_models(access_token: str, storage: Storage) -> None:
@@ -162,11 +134,6 @@ def list_models(storage: Storage) -> None:
     print(f"Total: {stored.total} models")
     print(f"{'=' * 80}\n")
 
-    # Show tip if limited models
-    if stored.total <= 10:
-        print("💡 Tip: For the full model list (35+ models including Claude, Gemini, GPT-5),")
-        print("   authenticate using GitHub CLI (gh): https://cli.github.com/\n")
-
 
 def show_raw(storage: Storage) -> None:
     """Display raw JSON data.
@@ -178,7 +145,7 @@ def show_raw(storage: Storage) -> None:
 
     raw = storage.get_raw_models()
     if not raw:
-        print("No models data found. Run 'copilot-fetcher fetch' first.")
+        print("No models found. Run 'copilot-fetcher fetch' first.")
         sys.exit(1)
 
     print(json.dumps(raw, indent=2, ensure_ascii=False))
@@ -200,25 +167,14 @@ def show_auth_status() -> None:
         print("  Install: https://cli.github.com/")
         print("  Then run: gh auth login")
 
-    print()
-
-    # Check OAuth
-    import os
-
-    client_id_env = "GITHUB_CLIENT_ID" in os.environ
-    print(f"OAuth Device Flow:")
-    print(f"  Environment: {'Configured' if client_id_env else 'Not configured'}")
-    print(f"  Model access: LIMITED (7 models)")
-
     print("\n" + "=" * 60)
-    print("\nRecommendation: Use GitHub CLI for full model access.\n")
 
 
 def main() -> int:
     """Main entry point."""
     parser = argparse.ArgumentParser(
         prog="copilot-fetcher",
-        description="Fetch GitHub Copilot models",
+        description="Fetch GitHub Copilot models via GitHub CLI",
     )
 
     parser.add_argument(
@@ -233,7 +189,7 @@ def main() -> int:
     # Auth command
     auth_parser = subparsers.add_parser(
         "auth",
-        help="Authenticate (uses gh CLI if available, else OAuth)",
+        help="Authenticate with GitHub CLI",
     )
     auth_parser.add_argument(
         "--force",

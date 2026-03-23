@@ -1,142 +1,72 @@
 # GitHub Copilot Model Fetcher
 
-获取 GitHub Copilot 可用模型列表的 Python 工具。
+Fetch available GitHub Copilot models using GitHub CLI authentication.
 
-支持两种认证方式：
-- **GitHub CLI (gh)** - 推荐，获取完整模型列表 (35+)
-- **OAuth Device Flow** - 备选，获取基础模型列表 (7)
+Gets the complete **35+ model list** including Claude, GPT-5, Gemini, Grok, and more.
 
-## 功能
+## Features
 
-- 双模式认证：GitHub CLI 或 OAuth Device Flow
-- 获取 GitHub Copilot 完整模型列表（Claude, GPT-5, Gemini, Grok）
-- 按提供商分组显示模型
-- 本地 JSON 存储
-- 命令行工具
+- GitHub CLI authentication
+- Fetch complete Copilot model list (35+ models)
+- Group models by provider
+- Local JSON storage
+- Command-line tool
 
-## 安装
+## Installation
 
 ```bash
-# 克隆仓库
+# Clone repository
 git clone https://github.com/KuuDS/github-copilot-model-fetcher.git
 cd github-copilot-model-fetcher
 
-# 使用 uv 安装依赖
+# Install dependencies
 uv pip install -e .
-
-# 或使用 pip
-pip install -e .
+# or: pip install -e .
 ```
 
-## 快速开始（推荐方式）
+## Prerequisites
 
-使用 **GitHub CLI** 获取完整模型列表（35+ 模型）：
+Install and configure **GitHub CLI**:
 
 ```bash
-# 1. 安装 GitHub CLI（如果尚未安装）
+# Install GitHub CLI
 # https://cli.github.com/
 
-# 2. 登录 GitHub
+# Login
 gh auth login
-
-# 3. 获取模型列表
-./run.sh fetch
-
-# 4. 查看模型
-./run.sh list
 ```
 
-## 支持的模型
+## Usage
 
-使用 GitHub CLI 认证可获取完整模型列表：
-
-### Anthropic Claude
-- Claude Opus 4.5, 4.6
-- Claude Sonnet 4, 4.5, 4.6
-- Claude Haiku 4.5
-
-### OpenAI GPT
-- GPT-4.1 系列
-- GPT-5 系列（5-mini, 5.1, 5.2, 5.4 等）
-- GPT-5 Codex 系列（5.1-codex, 5.2-codex, 5.3-codex 等）
-- GPT-4o 系列
-
-### Google Gemini
-- Gemini 2.5 Pro
-
-### xAI Grok
-- Grok Code Fast 1
-
-### 嵌入模型
-- text-embedding-3-small
-- text-embedding-ada-002
-
-## 认证方式
-
-### 方式 1：GitHub CLI（推荐）
-
-提供完整模型访问权限（35+ 模型）。
-
-```bash
-# 检查 gh CLI 状态
-./run.sh status
-
-# 获取模型
-./run.sh fetch
-```
-
-**要求：**
-- 安装 GitHub CLI: https://cli.github.com/
-- 运行 `gh auth login` 完成认证
-- 拥有 GitHub Copilot 订阅
-
-### 方式 2：OAuth Device Flow
-
-提供基础模型访问权限（7 个模型）。
-
-```bash
-# 1. 创建 GitHub OAuth App
-# 访问 https://github.com/settings/applications/new
-# - 启用 Device Flow
-# - 记下 Client ID
-
-# 2. 配置环境
-cp set_env.sh.template set_env.sh
-# 编辑 set_env.sh，填入你的 Client ID
-
-# 3. 认证并获取模型
-./run.sh auth
-./run.sh fetch
-./run.sh list
-```
-
-**注意：** OAuth 方式受限于 Copilot API 的访问策略，只能获取基础 GPT 模型。
-
-## 使用方法
-
-### 查看认证状态
+### Check authentication status
 
 ```bash
 ./run.sh status
 ```
 
-### 获取模型列表
+### Fetch model list
 
 ```bash
-# 使用 gh CLI（自动检测）
 ./run.sh fetch
-
-# 强制重新认证
-./run.sh fetch --force-auth
 ```
 
-### 查看模型列表
+Output:
+```
+✓ Using GitHub CLI (gh) authentication
+  Accessing full Copilot model list (35+ models)
+
+Fetching Copilot models...
+✓ Fetched 35 models
+✓ Saved to: ~/.copilot-fetcher/models.json
+```
+
+### List models
 
 ```bash
 ./run.sh list
 ```
 
-输出示例：
+Example output:
 
 ```
 ================================================================================
@@ -148,6 +78,8 @@ GitHub Copilot Models (fetched: 2026-03-23T16:28:24)
     (Claude Opus 4.6)
   • claude-sonnet-4.6
     (Claude Sonnet 4.6)
+  • claude-haiku-4.5
+    (Claude Haiku 4.5)
   • ...
 
 【OpenAI GPT】
@@ -155,8 +87,8 @@ GitHub Copilot Models (fetched: 2026-03-23T16:28:24)
     (GPT-5.4)
   • gpt-4.1
     (GPT-4.1)
-  • gpt-4o
-    (GPT-4o)
+  • gpt-5.1-codex
+    (GPT-5.1-Codex)
   • ...
 
 【Google Gemini】
@@ -172,50 +104,74 @@ Total: 35 models
 ================================================================================
 ```
 
-### 查看原始 JSON
+### View raw JSON
 
 ```bash
 ./run.sh raw
 ```
 
-### 清除存储的数据
+### Clear stored data
 
 ```bash
 ./run.sh clear
 ```
 
-## 存储位置
+## Supported Models
 
-默认数据存储在 `~/.copilot-fetcher/`：
+Complete model list available with GitHub CLI authentication:
 
-- `token.json` - 访问令牌（权限 600）
-- `models.json` - 获取的模型列表
+### Anthropic Claude
+- Claude Opus 4.5, 4.6
+- Claude Sonnet 4, 4.5, 4.6
+- Claude Haiku 4.5
 
-## API 参考
+### OpenAI GPT
+- GPT-4.1 series
+- GPT-5 series (5-mini, 5.1, 5.2, 5.4, etc.)
+- GPT-5 Codex series (5.1-codex, 5.2-codex, 5.3-codex, etc.)
+- GPT-4o series
+
+### Google Gemini
+- Gemini 2.5 Pro
+
+### xAI Grok
+- Grok Code Fast 1
+
+### Embedding Models
+- text-embedding-3-small
+- text-embedding-ada-002
+
+## Storage Location
+
+Default data stored in `~/.copilot-fetcher/`:
+
+- `token.json` - Access token (permissions 600)
+- `models.json` - Fetched model list
+
+## API Reference
 
 ### Python API
 
 ```python
 from copilot_fetcher import CopilotClient, get_gh_token
 
-# 使用 GitHub CLI token（推荐）
+# Get GitHub CLI token
 token = get_gh_token()
 
-# 使用客户端
+# Use client
 with CopilotClient(token) as client:
     response = client.get_models()
     for model in response.models:
         print(f"{model.name}: {model.id}")
 ```
 
-### 模块
+### Modules
 
-- `copilot_fetcher.gh_auth` - GitHub CLI 认证
-- `copilot_fetcher.oauth` - OAuth 2.0 Device Flow
-- `copilot_fetcher.api` - GitHub Copilot API 客户端
-- `copilot_fetcher.storage` - 本地数据存储
+- `copilot_fetcher.gh_auth` - GitHub CLI authentication
+- `copilot_fetcher.api` - GitHub Copilot API client
+- `copilot_fetcher.storage` - Local data storage
 
-## 故障排除
+## Troubleshooting
 
 ### "GitHub CLI is not authenticated"
 
@@ -223,51 +179,33 @@ with CopilotClient(token) as client:
 gh auth login
 ```
 
-### 只能获取 7 个模型
+### "gh command not found"
 
-这是 OAuth 认证的限制。使用 GitHub CLI 认证可获取 35+ 模型：
-
-```bash
-./run.sh clear  # 清除旧 token
-./run.sh fetch  # 将自动使用 gh CLI
-```
+Install GitHub CLI: https://cli.github.com/
 
 ### "No models found"
 
-运行获取命令：
+Run fetch command:
 
 ```bash
 ./run.sh fetch
 ```
 
-## 项目结构
+## Project Structure
 
 ```
 .
 ├── src/
 │   └── copilot_fetcher/
-│       ├── __init__.py      # 包入口
-│       ├── __main__.py      # CLI 入口
-│       ├── gh_auth.py       # GitHub CLI 认证
-│       ├── oauth.py         # OAuth 实现
-│       ├── api.py           # API 客户端
-│       └── storage.py       # 数据存储
-├── set_env.sh.template      # 环境配置模板
-├── run.sh                   # 启动脚本
-├── pyproject.toml           # 项目配置
-└── README.md               # 本文档
+│       ├── __init__.py      # Package entry
+│       ├── __main__.py      # CLI entry
+│       ├── gh_auth.py       # GitHub CLI auth
+│       ├── api.py           # API client
+│       └── storage.py       # Data storage
+├── run.sh                   # Launch script
+├── pyproject.toml           # Project config
+└── README.md               # This document
 ```
-
-## 为什么有两种认证方式？
-
-GitHub Copilot API 对不同类型的令牌返回不同的模型列表：
-
-| 认证方式 | 模型数量 | 包含的模型 |
-|---------|---------|-----------|
-| GitHub CLI (`gh auth token`) | 35+ | Claude, GPT-5, Gemini, Grok, 等 |
-| OAuth Device Flow | 7 | GPT-3.5, GPT-4o 基础模型 |
-
-这是因为 Copilot API 的内部权限控制机制。GitHub CLI 使用的是特殊的内部令牌端点，可以访问完整的模型列表。
 
 ## License
 
