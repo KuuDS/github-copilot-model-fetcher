@@ -28,10 +28,22 @@ jobs:
       run: |
         pip install -e .
     
-    - name: Fetch Copilot models
+    - name: Install GitHub CLI
+      uses: dev-hanz-ala/install-gh-cli-action@latest
+      with:
+        gh-cli-version: 2.67.0
+    
+    - name: Authenticate GitHub CLI
       env:
         GH_TOKEN: ${{ secrets.GH_TOKEN }}
       run: |
+        # Authenticate gh CLI using the token
+        echo "$GH_TOKEN" | gh auth login --with-token
+        gh auth status
+    
+    - name: Fetch Copilot models
+      run: |
+        # Use gh CLI to get token and fetch models
         python -m copilot_fetcher fetch
     
     - name: Copy models to repository
@@ -41,6 +53,8 @@ jobs:
         cp ~/.copilot-fetcher/models.json models/copilot-models-$(date +%Y-%m-%d).json
     
     - name: Create or update release branch
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         git config --local user.email "github-actions[bot]@users.noreply.github.com"
         git config --local user.name "github-actions[bot]"
@@ -70,7 +84,6 @@ jobs:
         fi
     
     - name: Create Release
-      if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |

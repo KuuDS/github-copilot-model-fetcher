@@ -175,6 +175,11 @@ with CopilotClient(token) as client:
 
 You can automatically fetch Copilot models daily using GitHub Actions.
 
+### ⚠️ Important Note
+
+**Personal Access Tokens (PAT) are NOT supported** by the GitHub Copilot API `/models` endpoint. 
+The workflow uses GitHub CLI (`gh`) with token authentication instead.
+
 ### Setup
 
 1. **Create a Personal Access Token**:
@@ -232,9 +237,19 @@ jobs:
     - name: Install dependencies
       run: pip install -e .
     
-    - name: Fetch Copilot models
+    - name: Install GitHub CLI
+      uses: dev-hanz-ala/install-gh-cli-action@latest
+      with:
+        gh-cli-version: 2.67.0
+    
+    - name: Authenticate GitHub CLI
       env:
         GH_TOKEN: ${{ secrets.GH_TOKEN }}
+      run: |
+        echo "$GH_TOKEN" | gh auth login --with-token
+        gh auth status
+    
+    - name: Fetch Copilot models
       run: python -m copilot_fetcher fetch
     
     - name: Commit to release branch
@@ -284,6 +299,19 @@ Run fetch command:
 ```bash
 ./run.sh fetch
 ```
+
+### GitHub Actions "Personal Access Tokens are not supported"
+
+The GitHub Copilot API `/models` endpoint **does not accept Personal Access Tokens (PAT)** directly.
+
+The workflow already handles this by:
+1. Installing GitHub CLI in the runner
+2. Authenticating `gh` with your PAT: `echo "$GH_TOKEN" | gh auth login --with-token`
+3. Using `gh auth token` to get a compatible token
+
+If you're seeing this error, ensure:
+- The `GH_TOKEN` secret is set correctly
+- The workflow includes the GitHub CLI installation step
 
 ### GitHub Actions "Resource not accessible"
 
