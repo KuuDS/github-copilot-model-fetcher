@@ -51,8 +51,7 @@ class CopilotClient:
             base_url=self.BASE_URL,
             headers={
                 "Authorization": f"Bearer {access_token}",
-                "Accept": "application/vnd.github+json",
-                "X-GitHub-Api-Version": "2022-11-28",
+                "Accept": "application/json",
             },
             timeout=30.0,
         )
