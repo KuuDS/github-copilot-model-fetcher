@@ -2,10 +2,8 @@ name: Daily Copilot Models Fetch
 
 on:
   schedule:
-    # Run at 00:00 UTC every day
     - cron: '0 0 * * *'
   workflow_dispatch:
-    # Allow manual trigger
 
 jobs:
   fetch-models:
@@ -30,7 +28,7 @@ jobs:
     
     - name: Install GitHub CLI
       run: |
-        # Install GitHub CLI on Ubuntu
+        type -p curl >/dev/null || (sudo apt update && sudo apt install curl -y)
         curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
         sudo chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg
         echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
@@ -39,44 +37,59 @@ jobs:
         gh --version
     
     - name: Fetch Copilot models
+      id: fetch
       env:
         GH_TOKEN: ${{ secrets.GH_TOKEN }}
       run: |
-        # Try to use gh CLI with GH_TOKEN for authentication
-        # Note: Copilot API requires special permissions that may not be available with standard tokens
-        echo "Attempting to fetch models..."
-        python -m copilot_fetcher fetch || echo "Model fetch failed - this is expected if token lacks Copilot permissions"
-    
-    - name: Copy models to repository
-      run: |
         mkdir -p models
-        cp ~/.copilot-fetcher/models.json models/copilot-models.json
-        cp ~/.copilot-fetcher/models.json models/copilot-models-$(date +%Y-%m-%d).json
+        
+        if python -m copilot_fetcher fetch 2>/tmp/fetch.log; then
+          echo "status=success" >> $GITHUB_OUTPUT
+          cp ~/.copilot-fetcher/models.json models/copilot-models.json
+          cp ~/.copilot-fetcher/models.json models/copilot-models-$(date +%Y-%m-%d).json
+          MODEL_COUNT=$(python3 -c "import json; print(json.load(open('models/copilot-models.json')).get('total', 0))" 2>/dev/null || echo "0")
+          echo "count=$MODEL_COUNT" >> $GITHUB_OUTPUT
+          echo "✅ Successfully fetched $MODEL_COUNT models"
+        else
+          echo "status=failed" >> $GITHUB_OUTPUT
+          echo "⚠️ Fetch failed - see logs below"
+          echo ""
+          echo "=== Fetch Error Log ==="
+          cat /tmp/fetch.log
+          echo "======================"
+          
+          # Create placeholder with error info
+          cat > models/copilot-models.json << EOF
+        {
+          "error": "GitHub Copilot API requires interactive authentication",
+          "message": "Personal Access Tokens are not supported for the Copilot /models endpoint",
+          "solution": "Run 'gh auth login' locally to get a proper token",
+          "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+          "data": [],
+          "total": 0
+        }
+        EOF
+          cp models/copilot-models.json models/copilot-models-$(date +%Y-%m-%d).json
+        fi
     
-    - name: Create or update release branch
+    - name: Commit to release branch
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         git config --local user.email "github-actions[bot]@users.noreply.github.com"
         git config --local user.name "github-actions[bot]"
         
-        # Fetch all branches
         git fetch origin
         
-        # Check if release branch exists
         if git show-ref --verify --quiet refs/remotes/origin/release; then
-          # Checkout existing release branch
           git checkout release
           git pull origin release
         else
-          # Create new release branch from main
           git checkout -b release
         fi
         
-        # Add and commit models
         git add models/
         
-        # Only commit if there are changes
         if git diff --cached --quiet; then
           echo "No changes to commit"
         else
@@ -85,20 +98,42 @@ jobs:
         fi
     
     - name: Create Release
+      if: steps.fetch.outputs.status == 'success'
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         DATE=$(date +%Y-%m-%d)
         
-        # Check if release already exists
         if gh release view "v$DATE" &>/dev/null; then
           echo "Release v$DATE already exists, updating..."
           gh release upload "v$DATE" models/copilot-models.json --clobber
         else
-          # Create new release
           gh release create "v$DATE" \
             --title "Copilot Models - $DATE" \
             --notes "Daily snapshot of GitHub Copilot available models" \
             models/copilot-models.json \
             models/copilot-models-$DATE.json
+        fi
+    
+    - name: Workflow Summary
+      run: |
+        echo "## Copilot Models Fetch Summary" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        
+        if [ "${{ steps.fetch.outputs.status }}" == "success" ]; then
+          echo "✅ **Success**" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- Models fetched: ${{ steps.fetch.outputs.count }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Timestamp: $(date -u +%Y-%m-%dT%H:%M:%SZ)" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "⚠️ **Fetch Failed**" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "This is expected when using Personal Access Token in GitHub Actions." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Reason:** GitHub Copilot API requires interactive authentication via 'gh auth login'" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Alternatives:**" >> $GITHUB_STEP_SUMMARY
+          echo "1. Use local scheduling (cron, systemd, launchd)" >> $GITHUB_STEP_SUMMARY
+          echo "2. Use self-hosted runner with pre-authenticated gh CLI" >> $GITHUB_STEP_SUMMARY
+          echo "3. Run manually: \\"gh auth login && ./run.sh fetch\\"" >> $GITHUB_STEP_SUMMARY
         fi

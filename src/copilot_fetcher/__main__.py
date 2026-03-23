@@ -243,6 +243,12 @@ def main() -> int:
         help="Show authentication status",
     )
 
+    # TUI command
+    subparsers.add_parser(
+        "tui",
+        help="Launch interactive TUI mode",
+    )
+
     # Clear command
     subparsers.add_parser(
         "clear",
@@ -272,6 +278,11 @@ def main() -> int:
 
     elif args.command == "status":
         show_auth_status()
+
+    elif args.command == "tui":
+        from copilot_fetcher.tui import main as tui_main
+
+        tui_main()
 
     elif args.command == "clear":
         storage.delete_token()
