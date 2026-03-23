@@ -1,17 +1,26 @@
 # GitHub Copilot Model Fetcher
 
-使用 OAuth 2.0 Device Flow 获取 GitHub Copilot 可用模型列表的 Python 工具。
+获取 GitHub Copilot 可用模型列表的 Python 工具。
+
+支持两种认证方式：
+- **GitHub CLI (gh)** - 推荐，获取完整模型列表 (35+)
+- **OAuth Device Flow** - 备选，获取基础模型列表 (7)
 
 ## 功能
 
-- OAuth 2.0 Device Flow 认证
-- 获取 GitHub Copilot 模型列表
+- 双模式认证：GitHub CLI 或 OAuth Device Flow
+- 获取 GitHub Copilot 完整模型列表（Claude, GPT-5, Gemini, Grok）
+- 按提供商分组显示模型
 - 本地 JSON 存储
 - 命令行工具
 
 ## 安装
 
 ```bash
+# 克隆仓库
+git clone https://github.com/KuuDS/github-copilot-model-fetcher.git
+cd github-copilot-model-fetcher
+
 # 使用 uv 安装依赖
 uv pip install -e .
 
@@ -19,98 +28,167 @@ uv pip install -e .
 pip install -e .
 ```
 
-## 配置
+## 快速开始（推荐方式）
 
-### 1. 创建 GitHub OAuth App
-
-1. 访问 https://github.com/settings/applications/new
-2. 填写应用信息：
-   - Application name: `Copilot Model Fetcher`
-   - Homepage URL: `http://localhost`
-   - Authorization callback URL: `http://localhost/callback`
-3. 点击 **Register application**
-4. 在应用设置中，勾选 **Enable Device Flow**
-5. 记下 **Client ID** (不需要 Client Secret)
-
-### 2. 设置环境变量
+使用 **GitHub CLI** 获取完整模型列表（35+ 模型）：
 
 ```bash
-export GITHUB_CLIENT_ID="Ov23lixxxxxxxxxxxx"
+# 1. 安装 GitHub CLI（如果尚未安装）
+# https://cli.github.com/
+
+# 2. 登录 GitHub
+gh auth login
+
+# 3. 获取模型列表
+./run.sh fetch
+
+# 4. 查看模型
+./run.sh list
 ```
 
-或将此行添加到 `~/.bashrc` 或 `~/.zshrc`
+## 支持的模型
+
+使用 GitHub CLI 认证可获取完整模型列表：
+
+### Anthropic Claude
+- Claude Opus 4.5, 4.6
+- Claude Sonnet 4, 4.5, 4.6
+- Claude Haiku 4.5
+
+### OpenAI GPT
+- GPT-4.1 系列
+- GPT-5 系列（5-mini, 5.1, 5.2, 5.4 等）
+- GPT-5 Codex 系列（5.1-codex, 5.2-codex, 5.3-codex 等）
+- GPT-4o 系列
+
+### Google Gemini
+- Gemini 2.5 Pro
+
+### xAI Grok
+- Grok Code Fast 1
+
+### 嵌入模型
+- text-embedding-3-small
+- text-embedding-ada-002
+
+## 认证方式
+
+### 方式 1：GitHub CLI（推荐）
+
+提供完整模型访问权限（35+ 模型）。
+
+```bash
+# 检查 gh CLI 状态
+./run.sh status
+
+# 获取模型
+./run.sh fetch
+```
+
+**要求：**
+- 安装 GitHub CLI: https://cli.github.com/
+- 运行 `gh auth login` 完成认证
+- 拥有 GitHub Copilot 订阅
+
+### 方式 2：OAuth Device Flow
+
+提供基础模型访问权限（7 个模型）。
+
+```bash
+# 1. 创建 GitHub OAuth App
+# 访问 https://github.com/settings/applications/new
+# - 启用 Device Flow
+# - 记下 Client ID
+
+# 2. 配置环境
+cp set_env.sh.template set_env.sh
+# 编辑 set_env.sh，填入你的 Client ID
+
+# 3. 认证并获取模型
+./run.sh auth
+./run.sh fetch
+./run.sh list
+```
+
+**注意：** OAuth 方式受限于 Copilot API 的访问策略，只能获取基础 GPT 模型。
 
 ## 使用方法
 
-### 认证
+### 查看认证状态
 
 ```bash
-python -m copilot_fetcher auth
+./run.sh status
 ```
-
-这将：
-1. 打开浏览器显示 GitHub 设备授权页面
-2. 在终端显示授权码
-3. 等待你在浏览器中输入授权码
-4. 完成后保存访问令牌
 
 ### 获取模型列表
 
 ```bash
-python -m copilot_fetcher fetch
-```
+# 使用 gh CLI（自动检测）
+./run.sh fetch
 
-这会获取所有可用的 Copilot 模型并保存到 `~/.copilot-fetcher/models.json`
+# 强制重新认证
+./run.sh fetch --force-auth
+```
 
 ### 查看模型列表
 
 ```bash
-python -m copilot_fetcher list
+./run.sh list
 ```
 
 输出示例：
 
 ```
 ================================================================================
-GitHub Copilot Models (fetched: 2024-01-15T10:30:00)
+GitHub Copilot Models (fetched: 2026-03-23T16:28:24)
 ================================================================================
 
-1. GPT-4
-   ID: gpt-4
-   Version: 2024-01-01
-   Provider: OpenAI
-   Description: GPT-4 model for code completion
-   Capabilities: code-completion, chat
+【Anthropic Claude】
+  • claude-opus-4.6
+    (Claude Opus 4.6)
+  • claude-sonnet-4.6
+    (Claude Sonnet 4.6)
+  • ...
 
-2. Claude 3.5 Sonnet
-   ID: claude-3.5-sonnet
-   Version: 2024-06-20
-   Provider: Anthropic
-   Description: Claude 3.5 Sonnet for Copilot
-   Capabilities: code-completion, chat, vision
+【OpenAI GPT】
+  • gpt-5.4
+    (GPT-5.4)
+  • gpt-4.1
+    (GPT-4.1)
+  • gpt-4o
+    (GPT-4o)
+  • ...
+
+【Google Gemini】
+  • gemini-2.5-pro
+    (Gemini 2.5 Pro)
+
+【xAI Grok】
+  • grok-code-fast-1
+    (Grok Code Fast 1)
 
 ================================================================================
-Total: 15 models
+Total: 35 models
 ================================================================================
 ```
 
 ### 查看原始 JSON
 
 ```bash
-python -m copilot_fetcher raw
+./run.sh raw
 ```
 
 ### 清除存储的数据
 
 ```bash
-python -m copilot_fetcher clear
+./run.sh clear
 ```
 
 ## 存储位置
 
 默认数据存储在 `~/.copilot-fetcher/`：
 
-- `token.json` - OAuth 访问令牌（权限 600）
+- `token.json` - 访问令牌（权限 600）
 - `models.json` - 获取的模型列表
 
 ## API 参考
@@ -118,10 +196,10 @@ python -m copilot_fetcher clear
 ### Python API
 
 ```python
-from copilot_fetcher import CopilotClient, get_access_token
+from copilot_fetcher import CopilotClient, get_gh_token
 
-# 获取访问令牌
-token = get_access_token("your_client_id")
+# 使用 GitHub CLI token（推荐）
+token = get_gh_token()
 
 # 使用客户端
 with CopilotClient(token) as client:
@@ -132,41 +210,35 @@ with CopilotClient(token) as client:
 
 ### 模块
 
-- `copilot_fetcher.oauth` - OAuth 2.0 Device Flow 实现
+- `copilot_fetcher.gh_auth` - GitHub CLI 认证
+- `copilot_fetcher.oauth` - OAuth 2.0 Device Flow
 - `copilot_fetcher.api` - GitHub Copilot API 客户端
 - `copilot_fetcher.storage` - 本地数据存储
 
-## OAuth 流程说明
-
-本工具使用 [OAuth 2.0 Device Authorization Grant](https://tools.ietf.org/html/rfc8628)（设备流）：
-
-1. 应用向 GitHub 请求设备代码和用户代码
-2. GitHub 返回设备代码、用户代码和验证 URI
-3. 应用显示用户代码，引导用户访问验证 URI
-4. 用户在浏览器中输入用户代码并授权
-5. 应用轮询令牌端点直到获得访问令牌
-6. 使用访问令牌调用 Copilot API
-
 ## 故障排除
 
-### "GITHUB_CLIENT_ID environment variable not set"
+### "GitHub CLI is not authenticated"
 
-设置环境变量：
 ```bash
-export GITHUB_CLIENT_ID="your_client_id"
+gh auth login
 ```
 
-### "Device code expired"
+### 只能获取 7 个模型
 
-用户在规定时间内未完成授权。重新运行认证命令。
+这是 OAuth 认证的限制。使用 GitHub CLI 认证可获取 35+ 模型：
 
-### "User denied authorization"
+```bash
+./run.sh clear  # 清除旧 token
+./run.sh fetch  # 将自动使用 gh CLI
+```
 
-用户在 GitHub 页面上点击了拒绝。重新运行认证命令。
+### "No models found"
 
-### API 错误
+运行获取命令：
 
-确保你的 GitHub 账户有 Copilot 订阅，并且 OAuth App 已正确配置。
+```bash
+./run.sh fetch
+```
 
 ## 项目结构
 
@@ -176,12 +248,26 @@ export GITHUB_CLIENT_ID="your_client_id"
 │   └── copilot_fetcher/
 │       ├── __init__.py      # 包入口
 │       ├── __main__.py      # CLI 入口
+│       ├── gh_auth.py       # GitHub CLI 认证
 │       ├── oauth.py         # OAuth 实现
 │       ├── api.py           # API 客户端
 │       └── storage.py       # 数据存储
+├── set_env.sh.template      # 环境配置模板
+├── run.sh                   # 启动脚本
 ├── pyproject.toml           # 项目配置
 └── README.md               # 本文档
 ```
+
+## 为什么有两种认证方式？
+
+GitHub Copilot API 对不同类型的令牌返回不同的模型列表：
+
+| 认证方式 | 模型数量 | 包含的模型 |
+|---------|---------|-----------|
+| GitHub CLI (`gh auth token`) | 35+ | Claude, GPT-5, Gemini, Grok, 等 |
+| OAuth Device Flow | 7 | GPT-3.5, GPT-4o 基础模型 |
+
+这是因为 Copilot API 的内部权限控制机制。GitHub CLI 使用的是特殊的内部令牌端点，可以访问完整的模型列表。
 
 ## License
 
