@@ -20,7 +20,7 @@ def get_access_token(storage: Storage, force: bool = False) -> str | None:
         force: Force re-authentication
 
     Returns:
-        Access token string or None if using gh CLI api
+        Access token string or None to use gh CLI api directly
 
     Raises:
         SystemExit: If gh CLI is not available
@@ -33,11 +33,21 @@ def get_access_token(storage: Storage, force: bool = False) -> str | None:
             return stored.access_token
 
     # Check if GH_TOKEN is set (for GitHub Actions)
+    # When GH_TOKEN is set, we use gh api command directly (not httpx)
+    # because PAT is not accepted by Copilot API
     env_token = get_token_from_env()
     if env_token:
-        print("✓ Using GH_TOKEN environment variable")
-        # Don't store env token, it's temporary
-        return env_token
+        # Check if gh CLI is available
+        gh_available, gh_message = check_gh_auth()
+        if gh_available:
+            print("✓ Using GitHub CLI with GH_TOKEN")
+            print("  (PAT will be handled internally by gh CLI)")
+            # Return None to trigger gh api command usage
+            return None
+        else:
+            print(f"Error: GH_TOKEN is set but {gh_message}")
+            print("GitHub CLI is required when using GH_TOKEN.")
+            sys.exit(1)
 
     # Use gh CLI
     gh_available, gh_message = check_gh_auth()
