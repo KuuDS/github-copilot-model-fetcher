@@ -16,7 +16,7 @@ class CopilotModel:
     name: str
     version: str
     description: str | None = None
-    capabilities: list[str] = field(default_factory=list)
+    capabilities: dict[str, Any] = field(default_factory=dict)
     limits: dict[str, Any] = field(default_factory=dict)
     provider: str | None = None
 
@@ -73,7 +73,9 @@ class CopilotClient:
         if response.status_code >= 400:
             try:
                 error_data = response.json()
-                message = error_data.get("message", "Unknown error")
+                message = error_data.get("message") or error_data.get("error", {}).get(
+                    "message", "Unknown error"
+                )
             except Exception:
                 message = response.text or "Unknown error"
 
@@ -100,7 +102,7 @@ class CopilotClient:
                     name=model_data.get("name", ""),
                     version=model_data.get("version", ""),
                     description=model_data.get("description"),
-                    capabilities=model_data.get("capabilities", []),
+                    capabilities=model_data.get("capabilities", {}),
                     limits=model_data.get("limits", {}),
                     provider=model_data.get("provider"),
                 )
@@ -135,7 +137,7 @@ class CopilotClient:
                 name=data.get("name", ""),
                 version=data.get("version", ""),
                 description=data.get("description"),
-                capabilities=data.get("capabilities", []),
+                capabilities=data.get("capabilities", {}),
                 limits=data.get("limits", {}),
                 provider=data.get("provider"),
             )
