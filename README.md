@@ -171,44 +171,47 @@ with CopilotClient(token) as client:
 - `copilot_fetcher.api` - GitHub Copilot API client
 - `copilot_fetcher.storage` - Local data storage
 
-## GitHub Actions Automation
+## GitHub Actions (Limited Support)
 
-You can automatically fetch Copilot models daily using GitHub Actions.
+⚠️ **Important Limitation**: The GitHub Copilot API `/models` endpoint **does not accept Personal Access Tokens (PAT)**. It requires a special internal token that can only be obtained through interactive GitHub CLI authentication (`gh auth login`).
 
-### ⚠️ Important Note
+Due to this limitation, **the automated workflow may not work** in GitHub Actions with standard PATs.
 
-**Personal Access Tokens (PAT) are NOT supported** by the GitHub Copilot API `/models` endpoint. 
-The workflow uses GitHub CLI (`gh`) with token authentication instead.
+### Recommended Approach: Local Scheduling
 
-### Setup
+Instead of GitHub Actions, use local scheduling:
+
+```bash
+# Add to your crontab (runs daily at midnight)
+0 0 * * * cd /path/to/github-copilot-model-fetcher && ./run.sh fetch
+
+# Or use a systemd timer, launchd (macOS), or other scheduler
+```
+
+### Alternative: GitHub Actions with Copilot Permissions
+
+If your organization has special Copilot API access:
 
 1. **Create a Personal Access Token**:
    - Go to https://github.com/settings/tokens
-   - Click "Generate new token (classic)"
-   - Select scopes: `repo`, `read:user`
-   - Copy the generated token
+   - Generate token with `repo` and `read:user` scopes
 
 2. **Add Token to Repository Secrets**:
-   - Go to your repository on GitHub
-   - Navigate to Settings → Secrets and variables → Actions
-   - Click "New repository secret"
-   - Name: `GH_TOKEN`
-   - Value: Your personal access token from step 1
-   - Click "Add secret"
+   - Settings → Secrets and variables → Actions
+   - Add `GH_TOKEN` secret
 
-3. **Enable GitHub Actions**:
-   - The workflow file `.github/workflows/daily-fetch.yml` is already included
-   - Actions will run automatically at 00:00 UTC every day
-   - You can also trigger manually from Actions tab
+3. **Workflow will attempt to fetch**:
+   - The workflow file is at `.github/workflows/daily-fetch.yml`
+   - May fail due to PAT limitations
 
-### What the Workflow Does
+### Why This Limitation Exists
 
-- **Schedule**: Runs daily at 00:00 UTC (configurable in the workflow)
-- **Manual Trigger**: Can be triggered manually from GitHub Actions tab
-- **Output**:
-  - Commits models to the `release` branch
-  - Creates/updates a GitHub Release with model snapshots
-  - Archives dated snapshots for historical tracking
+The Copilot API `/models` endpoint requires a special authentication token that is:
+- Generated during interactive `gh auth login`
+- Different from standard PATs
+- Not available in non-interactive environments like GitHub Actions
+
+This is a GitHub security design decision to control access to Copilot model information.
 
 ### Workflow Configuration
 
@@ -301,16 +304,23 @@ Run fetch command:
 
 ### GitHub Actions "Personal Access Tokens are not supported"
 
-The GitHub Copilot API `/models` endpoint **does not accept Personal Access Tokens (PAT)** directly.
+**This is a known limitation.** The GitHub Copilot API `/models` endpoint requires a special internal token that can only be obtained through interactive `gh auth login`. PATs are not accepted in GitHub Actions.
 
-The workflow already handles this by:
-1. Installing GitHub CLI in the runner
-2. Authenticating `gh` with your PAT: `echo "$GH_TOKEN" | gh auth login --with-token`
-3. Using `gh auth token` to get a compatible token
+**Solutions:**
 
-If you're seeing this error, ensure:
-- The `GH_TOKEN` secret is set correctly
-- The workflow includes the GitHub CLI installation step
+1. **Use local scheduling** (recommended):
+   ```bash
+   # Add to crontab
+   0 0 * * * cd /path/to/repo && ./run.sh fetch
+   ```
+
+2. **Run manually when needed**:
+   ```bash
+   gh auth login  # Interactive authentication
+   ./run.sh fetch
+   ```
+
+3. **Use a self-hosted runner** with pre-authenticated gh CLI
 
 ### GitHub Actions "Resource not accessible"
 
