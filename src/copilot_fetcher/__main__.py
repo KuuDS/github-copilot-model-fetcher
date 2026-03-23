@@ -3,50 +3,70 @@
 from __future__ import annotations
 
 import argparse
-import os
 import sys
 from datetime import datetime
 from pathlib import Path
 
 from copilot_fetcher.api import CopilotClient, CopilotAPIError
+from copilot_fetcher.gh_auth import check_gh_auth, get_gh_token, GitHubCLIError
 from copilot_fetcher.oauth import GitHubDeviceFlow, GitHubOAuthError, TokenResponse
 from copilot_fetcher.storage import Storage, StoredToken
 
 
-def get_client_id() -> str:
-    """Get OAuth client ID from environment or prompt."""
-    client_id = os.environ.get("GITHUB_CLIENT_ID")
-    if not client_id:
-        print("Error: GITHUB_CLIENT_ID environment variable not set")
-        print("\nTo use this tool, you need to:")
-        print("1. Create a GitHub OAuth App at https://github.com/settings/applications/new")
-        print("2. Enable 'Device Flow' in the app settings")
-        print("3. Set GITHUB_CLIENT_ID environment variable")
-        print("\nExample:")
-        print("  export GITHUB_CLIENT_ID=Ov23lixxx...")
-        sys.exit(1)
-    return client_id
+def get_access_token(storage: Storage, force: bool = False) -> str:
+    """Get access token using best available method.
 
-
-def authenticate(storage: Storage, client_id: str, force: bool = False) -> str:
-    """Authenticate and return access token.
+    Priority:
+    1. Use gh CLI token (recommended - provides full model list)
+    2. Use stored OAuth token
+    3. Perform OAuth Device Flow
 
     Args:
         storage: Storage instance
-        client_id: OAuth client ID
-        force: Force re-authentication even if token exists
+        force: Force re-authentication
 
     Returns:
         Access token string
     """
-    # Check for existing token
+    # Check for stored token unless forcing re-auth
     if not force:
         stored = storage.load_token()
         if stored:
-            print(f"Using existing token (created: {stored.created_at})")
+            print(f"Using stored token (created: {stored.created_at})")
             return stored.access_token
 
-    # Perform OAuth flow
+    # Try gh CLI first (preferred)
+    gh_available, gh_message = check_gh_auth()
+    if gh_available:
+        try:
+            token = get_gh_token()
+            print("✓ Using GitHub CLI (gh) authentication")
+            print("  This provides access to the full model list (35+ models)")
+
+            # Save token for reuse
+            stored_token = StoredToken(
+                access_token=token,
+                token_type="bearer",
+                scope="",
+                created_at=datetime.now().isoformat(),
+            )
+            storage.save_token(stored_token)
+
+            return token
+        except GitHubCLIError as e:
+            print(f"Note: {e}")
+            print("Falling back to OAuth authentication...\n")
+
+    # Fall back to OAuth Device Flow
+    print("Using OAuth Device Flow authentication")
+    print("Note: This may return a limited model list (7 models)")
+    print("For full access, install gh CLI: https://cli.github.com/\n")
+
+    client_id = input("Enter your GitHub OAuth App Client ID: ").strip()
+    if not client_id:
+        print("Error: Client ID is required")
+        sys.exit(1)
+
     flow = GitHubDeviceFlow(client_id)
 
     try:
@@ -108,25 +128,44 @@ def list_models(storage: Storage) -> None:
     print(f"GitHub Copilot Models (fetched: {stored.fetched_at})")
     print(f"{'=' * 80}")
 
-    for i, model in enumerate(stored.models, 1):
-        name = model.get("name", "Unknown")
+    # Group models by provider/family for better display
+    models_by_family: dict[str, list[dict]] = {}
+    for model in stored.models:
         model_id = model.get("id", "unknown")
-        version = model.get("version", "")
-        description = model.get("description") or "No description"
-        provider = model.get("provider", "Unknown")
-        capabilities = model.get("capabilities", [])
+        # Try to determine family from ID
+        if "claude" in model_id.lower():
+            family = "Anthropic Claude"
+        elif "gpt" in model_id.lower():
+            family = "OpenAI GPT"
+        elif "gemini" in model_id.lower():
+            family = "Google Gemini"
+        elif "grok" in model_id.lower():
+            family = "xAI Grok"
+        else:
+            family = "Other"
 
-        print(f"\n{i}. {name}")
-        print(f"   ID: {model_id}")
-        print(f"   Version: {version}")
-        print(f"   Provider: {provider}")
-        print(f"   Description: {description}")
-        if capabilities:
-            print(f"   Capabilities: {', '.join(capabilities)}")
+        if family not in models_by_family:
+            models_by_family[family] = []
+        models_by_family[family].append(model)
+
+    # Display grouped models
+    for family in sorted(models_by_family.keys()):
+        print(f"\n【{family}】")
+        for model in sorted(models_by_family[family], key=lambda m: m.get("id", "")):
+            model_id = model.get("id", "unknown")
+            name = model.get("name", model_id)
+            print(f"  • {model_id}")
+            if name != model_id:
+                print(f"    ({name})")
 
     print(f"\n{'=' * 80}")
     print(f"Total: {stored.total} models")
     print(f"{'=' * 80}\n")
+
+    # Show tip if limited models
+    if stored.total <= 10:
+        print("💡 Tip: For the full model list (35+ models including Claude, Gemini, GPT-5),")
+        print("   authenticate using GitHub CLI (gh): https://cli.github.com/\n")
 
 
 def show_raw(storage: Storage) -> None:
@@ -145,11 +184,41 @@ def show_raw(storage: Storage) -> None:
     print(json.dumps(raw, indent=2, ensure_ascii=False))
 
 
+def show_auth_status() -> None:
+    """Show authentication status."""
+    print("\nAuthentication Status")
+    print("=" * 60)
+
+    # Check gh CLI
+    gh_available, gh_message = check_gh_auth()
+    if gh_available:
+        print(f"✓ {gh_message}")
+        print("  Token source: gh auth token")
+        print("  Model access: FULL (35+ models)")
+    else:
+        print(f"✗ {gh_message}")
+        print("  Install: https://cli.github.com/")
+        print("  Then run: gh auth login")
+
+    print()
+
+    # Check OAuth
+    import os
+
+    client_id_env = "GITHUB_CLIENT_ID" in os.environ
+    print(f"OAuth Device Flow:")
+    print(f"  Environment: {'Configured' if client_id_env else 'Not configured'}")
+    print(f"  Model access: LIMITED (7 models)")
+
+    print("\n" + "=" * 60)
+    print("\nRecommendation: Use GitHub CLI for full model access.\n")
+
+
 def main() -> int:
     """Main entry point."""
     parser = argparse.ArgumentParser(
         prog="copilot-fetcher",
-        description="Fetch GitHub Copilot models via OAuth",
+        description="Fetch GitHub Copilot models",
     )
 
     parser.add_argument(
@@ -164,7 +233,7 @@ def main() -> int:
     # Auth command
     auth_parser = subparsers.add_parser(
         "auth",
-        help="Authenticate with GitHub OAuth",
+        help="Authenticate (uses gh CLI if available, else OAuth)",
     )
     auth_parser.add_argument(
         "--force",
@@ -195,6 +264,12 @@ def main() -> int:
         help="Show raw JSON data",
     )
 
+    # Status command
+    subparsers.add_parser(
+        "status",
+        help="Show authentication status",
+    )
+
     # Clear command
     subparsers.add_parser(
         "clear",
@@ -210,12 +285,10 @@ def main() -> int:
     storage = Storage(args.data_dir)
 
     if args.command == "auth":
-        client_id = get_client_id()
-        authenticate(storage, client_id, force=args.force)
+        get_access_token(storage, force=args.force)
 
     elif args.command == "fetch":
-        client_id = get_client_id()
-        access_token = authenticate(storage, client_id, force=args.force_auth)
+        access_token = get_access_token(storage, force=args.force_auth)
         fetch_models(access_token, storage)
 
     elif args.command == "list":
@@ -223,6 +296,9 @@ def main() -> int:
 
     elif args.command == "raw":
         show_raw(storage)
+
+    elif args.command == "status":
+        show_auth_status()
 
     elif args.command == "clear":
         storage.delete_token()
