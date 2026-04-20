@@ -25,7 +25,6 @@ See README.md for detailed setup instructions.
 from copilot_fetcher.api import CopilotClient, CopilotModel, ModelsResponse
 from copilot_fetcher.device_flow import (
     DeviceFlowError,
-    is_device_flow_available,
     poll_for_token,
     run_device_flow,
     start_device_flow,
@@ -51,7 +50,6 @@ __all__ = [
     "get_token_from_env",
     "get_token_type",
     "is_personal_access_token",
-    "is_device_flow_available",
     "run_device_flow",
     "start_device_flow",
     "poll_for_token",

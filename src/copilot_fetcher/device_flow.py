@@ -2,6 +2,9 @@
 
 Provides interactive authentication for headless environments like GitHub Actions.
 User scans a URL + enters a code to authorize the application.
+
+Uses GitHub CLI's official OAuth App by default, which grants the same
+permissions as 'gh auth login' (including full Copilot model access).
 """
 
 from __future__ import annotations
@@ -12,6 +15,10 @@ import time
 from typing import Any
 
 import httpx
+
+# GitHub CLI official OAuth App Client ID (public)
+# Using this gives the same token permissions as 'gh auth login'
+GH_CLI_CLIENT_ID = "178c6fc778ccc68e1d6a"
 
 
 class DeviceFlowError(Exception):
@@ -209,10 +216,13 @@ def update_repo_secret(token: str, secret_name: str = "GH_TOKEN") -> None:
 def is_device_flow_available() -> bool:
     """Check if device flow can be attempted.
 
+    Device flow is always available since we use GitHub CLI's
+    official OAuth App by default.
+
     Returns:
-        True if OAUTH_CLIENT_ID environment variable is set
+        True (device flow is always available)
     """
-    return bool(os.environ.get("OAUTH_CLIENT_ID"))
+    return True
 
 
 def run_device_flow() -> str:
@@ -226,15 +236,12 @@ def run_device_flow() -> str:
     Raises:
         DeviceFlowError: If any step fails
     """
-    client_id = os.environ.get("OAUTH_CLIENT_ID")
-    if not client_id:
-        raise DeviceFlowError(
-            "OAUTH_CLIENT_ID not set.\n"
-            "To use device flow in GitHub Actions:\n"
-            "1. Create an OAuth App: GitHub Settings → Developer settings → OAuth Apps\n"
-            "2. Copy the Client ID\n"
-            "3. Add it as a repository secret named OAUTH_CLIENT_ID"
-        )
+    # Prefer user's OAUTH_CLIENT_ID if set, otherwise use GitHub CLI's official app
+    client_id = os.environ.get("OAUTH_CLIENT_ID", GH_CLI_CLIENT_ID)
+    if client_id == GH_CLI_CLIENT_ID:
+        print("  Using GitHub CLI official OAuth App (default)")
+    else:
+        print("  Using custom OAuth App from OAUTH_CLIENT_ID")
 
     print("=" * 70)
     print("GitHub OAuth Device Flow")

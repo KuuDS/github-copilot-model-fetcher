@@ -11,7 +11,7 @@ from datetime import datetime
 from pathlib import Path
 
 from copilot_fetcher.api import CopilotAPIError, CopilotClient
-from copilot_fetcher.device_flow import DeviceFlowError, is_device_flow_available, run_device_flow
+from copilot_fetcher.device_flow import DeviceFlowError, run_device_flow
 from copilot_fetcher.gh_auth import (
     GitHubCLIError,
     check_gh_auth,
@@ -46,7 +46,7 @@ def get_access_token(
     1. Cached token from storage (unless force=True)
     2. GH_TOKEN environment variable (type-aware routing)
     3. GitHub CLI token (gh auth token)
-    4. Device flow (if allow_device_flow=True and OAUTH_CLIENT_ID is set)
+    4. Device flow (if allow_device_flow=True)
 
     Args:
         storage: Storage instance
@@ -93,7 +93,7 @@ def get_access_token(
             print("Personal Access Token (PAT) detected in GH_TOKEN")
             print("  PATs (ghp_*) are explicitly rejected by the Copilot /models endpoint.")
 
-            if allow_device_flow and is_device_flow_available():
+            if allow_device_flow:
                 print("  Attempting interactive device flow...")
                 try:
                     token = run_device_flow()
@@ -105,9 +105,6 @@ def get_access_token(
                         allow_device_flow=allow_device_flow,
                         reason=f"Device flow failed: {e}",
                     )
-            elif allow_device_flow:
-                print("  Device flow is not configured (OAUTH_CLIENT_ID missing).")
-                print("  Please set OAUTH_CLIENT_ID secret to enable device flow.")
 
             # Try gh CLI fallback as last resort (will likely fail with PAT too)
             print("  Falling back to gh api command (may also fail with PAT)...")
@@ -136,7 +133,7 @@ def get_access_token(
                 f"GitHub CLI returned a {token_type} token, "
                 "which is rejected by Copilot API"
             )
-            if allow_device_flow and is_device_flow_available():
+            if allow_device_flow:
                 print("Attempting device flow instead...")
                 try:
                     token = run_device_flow()
@@ -152,7 +149,7 @@ def get_access_token(
             pass  # Fall through to device flow or error
 
     # 4. Device flow as last resort
-    if allow_device_flow and is_device_flow_available():
+    if allow_device_flow:
         try:
             token = run_device_flow()
             _save_token_to_storage(storage, token)
@@ -392,11 +389,8 @@ def show_auth_status() -> None:
     else:
         print(f"GitHub CLI: {gh_message}")
 
-    # Check device flow
-    if is_device_flow_available():
-        print("Device Flow: available (OAUTH_CLIENT_ID set)")
-    else:
-        print("Device Flow: not configured (OAUTH_CLIENT_ID missing)")
+    # Device flow is always available (uses GitHub CLI official OAuth App by default)
+    print("Device Flow: available")
 
     print("\n" + "=" * 60)
 
