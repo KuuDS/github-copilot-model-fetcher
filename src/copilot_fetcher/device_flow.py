@@ -155,8 +155,8 @@ def update_repo_secret(token: str, secret_name: str = "GH_TOKEN") -> None:
     """Update a repository secret via GitHub CLI.
 
     Uses 'gh secret set' which encrypts the value server-side.
-    Prefers GH_TOKEN (PAT with repo scope), falls back to GITHUB_TOKEN
-    if workflow has secrets: write permission.
+    Requires GH_TOKEN to be a PAT with 'repo' scope.
+    GITHUB_TOKEN (Actions auto-provided) cannot modify secrets.
 
     Args:
         token: The secret value to store
@@ -171,13 +171,16 @@ def update_repo_secret(token: str, secret_name: str = "GH_TOKEN") -> None:
             "GITHUB_REPOSITORY not set. Cannot update secret outside of GitHub Actions."
         )
 
-    # Determine which token to use for gh CLI authentication
-    auth_token = os.environ.get("GH_TOKEN") or os.environ.get("GITHUB_TOKEN")
+    # GH_TOKEN must be a PAT with repo scope to update secrets.
+    # GITHUB_TOKEN (ghs_*) cannot write secrets.
+    auth_token = os.environ.get("GH_TOKEN")
     if not auth_token:
         raise DeviceFlowError(
-            "Cannot update repository secret: no authentication token available.\n"
-            "Set GH_TOKEN (PAT with 'repo' scope) or ensure GITHUB_TOKEN\n"
-            "has 'secrets: write' permission in the workflow."
+            "GH_TOKEN is not set. Cannot cache OAuth token to repository secrets.\n"
+            "Device flow succeeded, but the token will not persist across runs.\n"
+            "To enable caching, set GH_TOKEN to a Personal Access Token with 'repo' scope:\n"
+            "  1. https://github.com/settings/tokens/new → select 'repo'\n"
+            "  2. Add it as a repository secret named GH_TOKEN"
         )
 
     # Set up environment for gh CLI subprocess
@@ -194,15 +197,6 @@ def update_repo_secret(token: str, secret_name: str = "GH_TOKEN") -> None:
         )
         if result.returncode != 0:
             error = result.stderr.strip()
-            if "insufficient scopes" in error.lower() or "permission" in error.lower():
-                raise DeviceFlowError(
-                    f"gh secret set failed: {error}\n\n"
-                    "The token needs permission to update secrets.\n"
-                    "Solutions:\n"
-                    "  1. Set GH_TOKEN to a PAT with 'repo' scope\n"
-                    "  2. Add 'secrets: write' to workflow permissions\n"
-                    "     https://github.com/settings/tokens"
-                )
             raise DeviceFlowError(f"gh secret set failed: {error}")
     except FileNotFoundError:
         raise DeviceFlowError(
@@ -276,8 +270,13 @@ def run_device_flow() -> str:
 
     print("\nAuthorization successful!")
     print("Updating repository secret with new token...")
-    update_repo_secret(access_token)
-    print("Token cached. Next run will use the cached token automatically.")
+    try:
+        update_repo_secret(access_token)
+        print("Token cached. Next run will use the cached token automatically.")
+    except DeviceFlowError as e:
+        print(f"Warning: Could not cache token: {e}")
+        print("The OAuth token will be used for this run only.")
+        print("To enable caching, set GH_TOKEN to a PAT with 'repo' scope.")
     print()
 
     return access_token
