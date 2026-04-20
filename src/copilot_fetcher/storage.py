@@ -114,6 +114,19 @@ class Storage:
         with open(self.models_file, "w") as f:
             json.dump(data, f, indent=2, ensure_ascii=False)
 
+    def save_models_raw(self, data: dict[str, Any]) -> None:
+        """Save raw models API response to JSON file.
+
+        Preserves all fields from the original API response without filtering.
+
+        Args:
+            data: Raw JSON dict from the API response
+        """
+        data["fetched_at"] = datetime.now().isoformat()
+
+        with open(self.models_file, "w") as f:
+            json.dump(data, f, indent=2, ensure_ascii=False)
+
     def load_models(self) -> StoredModels | None:
         """Load stored models from file.
 

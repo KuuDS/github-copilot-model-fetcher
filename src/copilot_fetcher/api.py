@@ -160,6 +160,38 @@ class CopilotClient:
             total=data.get("total", len(models)),
         )
 
+    def get_models_raw(self) -> dict[str, Any]:
+        """Fetch available Copilot models and return raw JSON response.
+
+        Returns the complete API response without filtering, preserving
+        all fields from the original response.
+
+        Uses httpx if access_token is provided, otherwise falls back to gh CLI.
+
+        Returns:
+            Raw JSON dict from the API response
+
+        Raises:
+            CopilotAPIError: If API request fails
+        """
+        # If no token provided, use gh CLI api command
+        if not self.client:
+            try:
+                return fetch_models_via_gh_cli()
+            except CopilotAPIError:
+                raise
+
+        # Use httpx with token
+        try:
+            response = self.client.get("/models")
+            self._handle_error(response)
+            return response.json()
+
+        except httpx.HTTPStatusError as e:
+            raise CopilotAPIError(f"HTTP error fetching models: {e}") from e
+        except httpx.RequestError as e:
+            raise CopilotAPIError(f"Network error fetching models: {e}") from e
+
     def get_models(self) -> ModelsResponse:
         """Fetch available Copilot models.
 
@@ -171,25 +203,11 @@ class CopilotClient:
         Raises:
             CopilotAPIError: If API request fails
         """
-        # If no token provided, use gh CLI api command
-        if not self.client:
-            try:
-                data = fetch_models_via_gh_cli()
-                return self._parse_models(data)
-            except CopilotAPIError:
-                raise
-
-        # Use httpx with token
         try:
-            response = self.client.get("/models")
-            self._handle_error(response)
-            data = response.json()
+            data = self.get_models_raw()
             return self._parse_models(data)
-
-        except httpx.HTTPStatusError as e:
-            raise CopilotAPIError(f"HTTP error fetching models: {e}") from e
-        except httpx.RequestError as e:
-            raise CopilotAPIError(f"Network error fetching models: {e}") from e
+        except CopilotAPIError:
+            raise
 
     def get_model(self, model_id: str) -> CopilotModel:
         """Fetch specific model details.

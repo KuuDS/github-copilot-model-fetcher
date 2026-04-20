@@ -90,6 +90,12 @@ jobs:
           git push origin release
         fi
 
+        # Create and push tag
+        TAG="v$(date +%Y-%m-%d-%H%M%S)"
+        git tag "$TAG"
+        git push origin "$TAG"
+        echo "Created tag: $TAG"
+
     - name: Create Release
       if: success()
       env:

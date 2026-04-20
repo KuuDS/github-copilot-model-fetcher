@@ -9,6 +9,7 @@ import sys
 import time
 from datetime import datetime
 from pathlib import Path
+from typing import Any
 
 from copilot_fetcher.api import CopilotAPIError, CopilotClient
 from copilot_fetcher.device_flow import DeviceFlowError, run_device_flow
@@ -267,12 +268,13 @@ def fetch_models(access_token: str | None, storage: Storage) -> None:
     print("\nFetching Copilot models...")
 
     failures = 0
+    raw_data: dict[str, Any] | None = None
     while failures < _MAX_TOKEN_FAILURES:
         _check_timeout()
 
         try:
             with CopilotClient(access_token) as client:
-                response = client.get_models()
+                raw_data = client.get_models_raw()
             break  # Success
         except CopilotAPIError as e:
             failures += 1
@@ -286,18 +288,21 @@ def fetch_models(access_token: str | None, storage: Storage) -> None:
             # If token-related error, try to re-authenticate
             if "not accepted" in error_msg.lower() or "not supported" in error_msg.lower():
                 print("Token rejected by Copilot API. Trying to re-authenticate...")
-                # For now, just retry. In a future enhancement, we could
-                # trigger device flow again here for manual triggers.
                 time.sleep(2)
             else:
                 # Non-token error, fail immediately
                 print(f"Non-recoverable error: {error_msg}")
                 sys.exit(1)
 
-    # Save to storage
-    storage.save_models(response)
+    if raw_data is None:
+        print("No data received from API.")
+        sys.exit(1)
 
-    print(f"Fetched {response.total} models")
+    # Save raw JSON to storage (preserves all API fields)
+    storage.save_models_raw(raw_data)
+
+    total = raw_data.get("total", len(raw_data.get("data", [])))
+    print(f"Fetched {total} models")
     print(f"Saved to: {storage.models_file}")
 
 
