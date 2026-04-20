@@ -7,15 +7,11 @@ from __future__ import annotations
 
 import sys
 from dataclasses import dataclass, field
-from typing import Any
 
 from prompt_toolkit import PromptSession
-from prompt_toolkit.completion import Completer, Completion
 from prompt_toolkit.key_binding import KeyBindings
 from prompt_toolkit.shortcuts import clear
 from rich.console import Console
-from rich.live import Live
-from rich.markdown import Markdown
 from rich.panel import Panel
 from rich.progress import Progress, SpinnerColumn, TextColumn
 from rich.table import Table
@@ -23,7 +19,6 @@ from rich.text import Text
 
 from copilot_fetcher.api import CopilotAPIError, CopilotClient
 from copilot_fetcher.gh_auth import get_gh_token
-
 
 console = Console()
 

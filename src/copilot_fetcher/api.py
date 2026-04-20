@@ -57,7 +57,18 @@ def fetch_models_via_gh_cli() -> dict[str, Any]:
             timeout=30,
         )
         if result.returncode != 0:
-            raise CopilotAPIError(f"gh api failed: {result.stderr}")
+            stderr = result.stderr.strip()
+            lower_stderr = stderr.lower()
+            if "personal access token" in lower_stderr or "not supported" in lower_stderr:
+                raise CopilotAPIError(
+                    f"gh api failed: {stderr}\n\n"
+                    "The GitHub CLI is also using a PAT, which is rejected by the Copilot API.\n"
+                    "Solutions:\n"
+                    "  1. Use an OAuth token (gho_*) from 'gh auth login'\n"
+                    "  2. Run the workflow manually (workflow_dispatch) to use device flow\n"
+                    "  3. Use local scheduling (cron, systemd, launchd) instead"
+                )
+            raise CopilotAPIError(f"gh api failed: {stderr}")
         return json.loads(result.stdout)
     except subprocess.TimeoutExpired:
         raise CopilotAPIError("Timeout calling gh api")
@@ -117,6 +128,16 @@ class CopilotClient:
             except Exception:
                 message = response.text or "Unknown error"
 
+            lower_message = message.lower()
+            if "personal access token" in lower_message or "not supported" in lower_message:
+                raise CopilotAPIError(
+                    f"API error {response.status_code}: {message}\n\n"
+                    "This token type is not accepted by the Copilot API.\n"
+                    "Solutions:\n"
+                    "  1. Use an OAuth token (gho_*) from 'gh auth login'\n"
+                    "  2. Run the workflow manually (workflow_dispatch) to use device flow\n"
+                    "  3. Use local scheduling (cron, systemd, launchd) instead"
+                )
             raise CopilotAPIError(f"API error {response.status_code}: {message}")
 
     def _parse_models(self, data: dict[str, Any]) -> ModelsResponse:

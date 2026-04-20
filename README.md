@@ -171,47 +171,40 @@ with CopilotClient(token) as client:
 - `copilot_fetcher.api` - GitHub Copilot API client
 - `copilot_fetcher.storage` - Local data storage
 
-## GitHub Actions (Limited Support)
+## GitHub Actions Device Flow Setup
 
-⚠️ **Important Limitation**: The GitHub Copilot API `/models` endpoint **does not accept Personal Access Tokens (PAT)**. It requires a special internal token that can only be obtained through interactive GitHub CLI authentication (`gh auth login`).
+This project supports **interactive OAuth device flow** in GitHub Actions. When you manually trigger the workflow, it displays a verification link and code in the Actions logs. You scan/authorize, and the OAuth token is automatically cached for future runs.
 
-Due to this limitation, **the automated workflow may not work** in GitHub Actions with standard PATs.
+### Setup Steps
 
-### Recommended Approach: Local Scheduling
+1. **Create an OAuth App**:
+   - Go to GitHub Settings → Developer settings → OAuth Apps → New OAuth App
+   - Application name: `Copilot Model Fetcher`
+   - Homepage URL: `https://github.com/{your-username}/github-copilot-model-info-fetcher`
+   - Authorization callback URL: `http://localhost`
+   - Save and copy the **Client ID** (you do NOT need the Client Secret)
 
-Instead of GitHub Actions, use local scheduling:
+2. **Add Repository Secret**:
+   - Go to Repository Settings → Secrets and variables → Actions → New repository secret
+   - Name: `OAUTH_CLIENT_ID`
+   - Value: The Client ID from step 1
 
-```bash
-# Add to your crontab (runs daily at midnight)
-0 0 * * * cd /path/to/github-copilot-model-fetcher && ./run.sh fetch
+3. **Trigger Workflow Manually**:
+   - Go to Actions → "Daily Copilot Models Fetch" → "Run workflow"
+   - Open the workflow run logs
+   - You will see a link and a user code - open the link and enter the code
+   - After authorization, the OAuth token is automatically cached in `GH_TOKEN` secret
 
-# Or use a systemd timer, launchd (macOS), or other scheduler
-```
+### Trigger Behavior
 
-### Alternative: GitHub Actions with Copilot Permissions
+| Trigger Type | Device Flow | On Token Failure |
+|-------------|-------------|------------------|
+| `workflow_dispatch` (manual) | Enabled - shows link + code | Creates issue to notify you |
+| `schedule` (cron) | Disabled | Creates issue to notify you |
 
-If your organization has special Copilot API access:
+### Why Not PAT?
 
-1. **Create a Personal Access Token**:
-   - Go to https://github.com/settings/tokens
-   - Generate token with `repo` and `read:user` scopes
-
-2. **Add Token to Repository Secrets**:
-   - Settings → Secrets and variables → Actions
-   - Add `GH_TOKEN` secret
-
-3. **Workflow will attempt to fetch**:
-   - The workflow file is at `.github/workflows/daily-fetch.yml`
-   - May fail due to PAT limitations
-
-### Why This Limitation Exists
-
-The Copilot API `/models` endpoint requires a special authentication token that is:
-- Generated during interactive `gh auth login`
-- Different from standard PATs
-- Not available in non-interactive environments like GitHub Actions
-
-This is a GitHub security design decision to control access to Copilot model information.
+The GitHub Copilot API (`api.githubcopilot.com/models`) **explicitly rejects Personal Access Tokens (PATs)** with HTTP 400. Only OAuth tokens (`gho_*` from `gh auth login` or device flow) and GitHub App tokens (`ghs_*`) are accepted.
 
 ### Workflow Configuration
 
@@ -223,42 +216,37 @@ name: Daily Copilot Models Fetch
 on:
   schedule:
     - cron: '0 0 * * *'  # Daily at 00:00 UTC
-  workflow_dispatch:     # Allow manual trigger
+  workflow_dispatch:     # Allow manual trigger (enables device flow)
 
 jobs:
   fetch-models:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    
+    # Uses default permissions (repo scope) for secret updates and issue creation
+
     steps:
     - uses: actions/checkout@v4
     - uses: actions/setup-python@v5
       with:
         python-version: '3.12'
-    
+
     - name: Install dependencies
-      run: pip install -e .
-    
-    - name: Install GitHub CLI
-      run: |
-        # Install GitHub CLI
-        curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
-        sudo chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg
-        echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
-        sudo apt update
-        sudo apt install gh -y
-    
+      run: pip install -e ".[dev]"
+
     - name: Fetch Copilot models
       env:
         GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        OAUTH_CLIENT_ID: ${{ secrets.OAUTH_CLIENT_ID }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_REPOSITORY: ${{ github.repository }}
+        GITHUB_ACTOR: ${{ github.actor }}
+        GITHUB_EVENT_NAME: ${{ github.event_name }}
       run: python -m copilot_fetcher fetch
-    
+
     - name: Commit to release branch
       run: |
         # Commits models to release branch
         # Creates dated snapshots
-    
+
     - name: Create Release
       run: |
         # Creates GitHub Release with model files
@@ -266,14 +254,14 @@ jobs:
 
 ### Environment Variables
 
-The tool supports two authentication methods:
-
-| Method | Environment Variable | Use Case |
-|--------|---------------------|----------|
-| GitHub CLI Token | `gh auth token` | Local development |
-| Personal Access Token | `GH_TOKEN` | GitHub Actions, CI/CD |
-
-For GitHub Actions, set `GH_TOKEN` in your repository secrets.
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `GH_TOKEN` | Yes* | OAuth token (`gho_*`) or PAT (`ghp_*`). OAuth works; PAT triggers device flow |
+| `OAUTH_CLIENT_ID` | For device flow | Your OAuth App's Client ID |
+| `GITHUB_TOKEN` | In Actions | Auto-provided by GitHub Actions |
+| `GITHUB_REPOSITORY` | In Actions | Auto-provided by GitHub Actions |
+| `GITHUB_ACTOR` | In Actions | Auto-provided by GitHub Actions |
+| `GITHUB_EVENT_NAME` | In Actions | Auto-provided by GitHub Actions |
 
 ## Troubleshooting
 
@@ -304,32 +292,45 @@ Run fetch command:
 
 ### GitHub Actions "Personal Access Tokens are not supported"
 
-**This is a known limitation.** The GitHub Copilot API `/models` endpoint requires a special internal token that can only be obtained through interactive `gh auth login`. PATs are not accepted in GitHub Actions.
+**This is expected if you are using a PAT.** The Copilot API only accepts OAuth tokens.
 
 **Solutions:**
 
-1. **Use local scheduling** (recommended):
+1. **Use device flow** (for Actions):
+   - Set `OAUTH_CLIENT_ID` secret
+   - Trigger workflow manually (`workflow_dispatch`)
+   - Follow the link + code in the Actions logs
+
+2. **Use local scheduling**:
    ```bash
    # Add to crontab
    0 0 * * * cd /path/to/repo && ./run.sh fetch
    ```
 
-2. **Run manually when needed**:
+3. **Run manually when needed**:
    ```bash
    gh auth login  # Interactive authentication
    ./run.sh fetch
    ```
 
-3. **Use a self-hosted runner** with pre-authenticated gh CLI
+### Scheduled Run Created an Issue
 
-### GitHub Actions "Resource not accessible"
+When a scheduled run fails due to an expired/missing token, the workflow automatically creates a GitHub Issue and @mentions you. To fix it:
 
-Ensure the workflow has proper permissions:
+1. Go to the Issue and click the link to Actions
+2. Trigger the workflow manually (`workflow_dispatch`)
+3. Complete the device flow in the logs
+4. The new token will be cached automatically
 
-```yaml
-permissions:
-  contents: write
-```
+### Token Expired
+
+OAuth tokens from `gh auth login` typically expire after 8 hours. When this happens:
+- **Manual trigger**: Device flow will re-authenticate automatically
+- **Scheduled trigger**: Workflow fails and creates an Issue to notify you
+
+### "Device flow not configured"
+
+You need to create an OAuth App and add `OAUTH_CLIENT_ID` as a repository secret. See [GitHub Actions Device Flow Setup](#github-actions-device-flow-setup) above.
 
 ## Project Structure
 

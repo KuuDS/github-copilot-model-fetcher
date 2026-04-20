@@ -8,24 +8,24 @@ on:
 jobs:
   fetch-models:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    
+    # Default permissions (repo scope) are needed for secret updates and issue creation
+    # Do not restrict permissions here - GITHUB_TOKEN needs repo scope for gh secret set
+
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
-    
+
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
         python-version: '3.12'
-    
+
     - name: Install dependencies
       run: |
-        pip install -e .
-    
+        pip install -e ".[dev]"
+
     - name: Install GitHub CLI
       run: |
         type -p curl >/dev/null || (sudo apt update && sudo apt install curl -y)
@@ -35,75 +35,66 @@ jobs:
         sudo apt update
         sudo apt install gh -y
         gh --version
-    
+
     - name: Fetch Copilot models
       id: fetch
       env:
         GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        OAUTH_CLIENT_ID: ${{ secrets.OAUTH_CLIENT_ID }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_REPOSITORY: ${{ github.repository }}
+        GITHUB_ACTOR: ${{ github.actor }}
+        GITHUB_EVENT_NAME: ${{ github.event_name }}
       run: |
         mkdir -p models
-        
-        if python -m copilot_fetcher fetch 2>/tmp/fetch.log; then
-          echo "status=success" >> $GITHUB_OUTPUT
-          cp ~/.copilot-fetcher/models.json models/copilot-models.json
-          cp ~/.copilot-fetcher/models.json models/copilot-models-$(date +%Y-%m-%d).json
-          MODEL_COUNT=$(python3 -c "import json; print(json.load(open('models/copilot-models.json')).get('total', 0))" 2>/dev/null || echo "0")
-          echo "count=$MODEL_COUNT" >> $GITHUB_OUTPUT
-          echo "✅ Successfully fetched $MODEL_COUNT models"
-        else
-          echo "status=failed" >> $GITHUB_OUTPUT
-          echo "⚠️ Fetch failed - see logs below"
-          echo ""
-          echo "=== Fetch Error Log ==="
-          cat /tmp/fetch.log
-          echo "======================"
-          
-          # Create placeholder with error info
-          cat > models/copilot-models.json << EOF
-        {
-          "error": "GitHub Copilot API requires interactive authentication",
-          "message": "Personal Access Tokens are not supported for the Copilot /models endpoint",
-          "solution": "Run 'gh auth login' locally to get a proper token",
-          "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
-          "data": [],
-          "total": 0
-        }
-        EOF
-          cp models/copilot-models.json models/copilot-models-$(date +%Y-%m-%d).json
-        fi
-    
+        python -m copilot_fetcher fetch
+
+        # Copy model files for commit
+        cp ~/.copilot-fetcher/models.json models/copilot-models.json
+        cp ~/.copilot-fetcher/models.json models/copilot-models-$(date +%Y-%m-%d).json
+
+        MODEL_COUNT=$(python3 -c "import json; print(json.load(open('models/copilot-models.json')).get('total', 0))" 2>/dev/null || echo "0")
+        echo "count=$MODEL_COUNT" >> $GITHUB_OUTPUT
+
+        # Print model list to logs
+        echo ""
+        echo "=== Fetched Models ==="
+        python -m copilot_fetcher list
+        echo "======================"
+
     - name: Commit to release branch
+      if: success()
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         git config --local user.email "github-actions[bot]@users.noreply.github.com"
         git config --local user.name "github-actions[bot]"
-        
+
         git fetch origin
-        
+
         if git show-ref --verify --quiet refs/remotes/origin/release; then
           git checkout release
           git pull origin release
         else
           git checkout -b release
         fi
-        
+
         git add models/
-        
+
         if git diff --cached --quiet; then
           echo "No changes to commit"
         else
           git commit -m "Update Copilot models - $(date +%Y-%m-%d %H:%M:%S UTC)"
           git push origin release
         fi
-    
+
     - name: Create Release
-      if: steps.fetch.outputs.status == 'success'
+      if: success()
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         DATE=$(date +%Y-%m-%d)
-        
+
         if gh release view "v$DATE" &>/dev/null; then
           echo "Release v$DATE already exists, updating..."
           gh release upload "v$DATE" models/copilot-models.json --clobber
@@ -114,26 +105,24 @@ jobs:
             models/copilot-models.json \
             models/copilot-models-$DATE.json
         fi
-    
+
     - name: Workflow Summary
+      if: always()
       run: |
         echo "## Copilot Models Fetch Summary" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
-        
-        if [ "${{ steps.fetch.outputs.status }}" == "success" ]; then
-          echo "✅ **Success**" >> $GITHUB_STEP_SUMMARY
+
+        if [ "${{ steps.fetch.outcome }}" == "success" ]; then
+          echo "Success" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "- Models fetched: ${{ steps.fetch.outputs.count }}" >> $GITHUB_STEP_SUMMARY
           echo "- Timestamp: $(date -u +%Y-%m-%dT%H:%M:%SZ)" >> $GITHUB_STEP_SUMMARY
         else
-          echo "⚠️ **Fetch Failed**" >> $GITHUB_STEP_SUMMARY
+          echo "Fetch Failed" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "This is expected when using Personal Access Token in GitHub Actions." >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Reason:** GitHub Copilot API requires interactive authentication via gh auth login" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Alternatives:**" >> $GITHUB_STEP_SUMMARY
-          echo "1. Use local scheduling (cron, systemd, launchd)" >> $GITHUB_STEP_SUMMARY
-          echo "2. Use self-hosted runner with pre-authenticated gh CLI" >> $GITHUB_STEP_SUMMARY
-          echo "3. Run manually: gh auth login && ./run.sh fetch" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ github.event_name }}" == "schedule" ]; then
+            echo "A notification issue has been created. Please check the Issues tab." >> $GITHUB_STEP_SUMMARY
+          else
+            echo "Manual trigger failed. Check the logs for device flow instructions." >> $GITHUB_STEP_SUMMARY
+          fi
         fi

@@ -30,6 +30,38 @@ def get_token_from_env() -> str | None:
     return os.environ.get("GH_TOKEN")
 
 
+def get_token_type(token: str) -> str:
+    """Classify a GitHub token by its prefix.
+
+    Args:
+        token: GitHub token string
+
+    Returns:
+        Token type: "pat", "oauth", "app", or "unknown"
+    """
+    if not token:
+        return "unknown"
+    if token.startswith("ghp_") or token.startswith("github_pat_"):
+        return "pat"
+    if token.startswith("gho_"):
+        return "oauth"
+    if token.startswith("ghs_"):
+        return "app"
+    return "unknown"
+
+
+def is_personal_access_token(token: str) -> bool:
+    """Check if token is a Personal Access Token (rejected by Copilot API).
+
+    Args:
+        token: GitHub token string
+
+    Returns:
+        True if token is a PAT
+    """
+    return get_token_type(token) == "pat"
+
+
 def get_gh_token() -> str:
     """Get authentication token from GitHub CLI or environment.
 
