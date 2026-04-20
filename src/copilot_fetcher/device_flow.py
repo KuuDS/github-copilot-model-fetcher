@@ -236,12 +236,10 @@ def run_device_flow() -> str:
     Raises:
         DeviceFlowError: If any step fails
     """
-    # Prefer user's OAUTH_CLIENT_ID if set, otherwise use GitHub CLI's official app
-    client_id = os.environ.get("OAUTH_CLIENT_ID", GH_CLI_CLIENT_ID)
-    if client_id == GH_CLI_CLIENT_ID:
-        print("  Using GitHub CLI official OAuth App (default)")
-    else:
-        print("  Using custom OAuth App from OAUTH_CLIENT_ID")
+    # Always use GitHub CLI's official OAuth App for full Copilot model access
+    # Custom OAuth Apps only return limited models (7 vs 34)
+    client_id = GH_CLI_CLIENT_ID
+    print("  Using GitHub CLI official OAuth App")
 
     print("=" * 70)
     print("GitHub OAuth Device Flow")
