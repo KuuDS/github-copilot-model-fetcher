@@ -85,8 +85,11 @@ def poll_for_token(
     start_time = time.time()
     current_interval = interval
 
-    print(f"\nWaiting for authorization (timeout: {timeout}s)...")
-    print("If you don't complete authorization in time, the workflow will fail.\n")
+    print(f"\nWaiting for authorization (timeout: {timeout}s)...", flush=True)
+    print(
+        "If you don't complete authorization in time, the workflow will fail.\n",
+        flush=True,
+    )
 
     while time.time() - start_time < timeout:
         time.sleep(current_interval)
@@ -113,12 +116,18 @@ def poll_for_token(
                 # User hasn't completed authorization yet, keep polling
                 elapsed = int(time.time() - start_time)
                 remaining = timeout - elapsed
-                print(f"  Waiting... ({elapsed}s elapsed, {remaining}s remaining)")
+                print(
+                    f"  Waiting... ({elapsed}s elapsed, {remaining}s remaining)",
+                    flush=True,
+                )
                 continue
             elif error == "slow_down":
                 # Server asks us to slow down
                 current_interval += 5
-                print(f"  Server asked to slow down, interval increased to {current_interval}s")
+                print(
+                    f"  Server asked to slow down, interval increased to {current_interval}s",
+                    flush=True,
+                )
                 continue
             elif error == "expired_token":
                 raise DeviceFlowError(
@@ -221,18 +230,21 @@ def run_device_flow() -> str:
     device_code = flow_data["device_code"]
     interval = flow_data.get("interval", 5)
 
-    print("Please authorize this application:")
-    print()
-    print("  1. Open this link in your browser:")
+    print("Please authorize this application:", flush=True)
+    print(flush=True)
+    print("  1. Open this link in your browser:", flush=True)
     if verification_uri_complete:
-        print(f"     {verification_uri_complete}")
+        print(f"     {verification_uri_complete}", flush=True)
     else:
-        print(f"     {verification_uri}")
-    print()
-    print(f"  2. Enter this code: {user_code}")
-    print()
-    print("  (If the link above doesn't work, go to the URL and enter the code manually)")
-    print()
+        print(f"     {verification_uri}", flush=True)
+    print(flush=True)
+    print(f"  2. Enter this code: {user_code}", flush=True)
+    print(flush=True)
+    print(
+        "  (If the link above doesn't work, go to the URL and enter the code manually)",
+        flush=True,
+    )
+    print(flush=True)
 
     access_token = poll_for_token(client_id, device_code, interval)
 

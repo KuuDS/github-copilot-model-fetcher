@@ -45,6 +45,7 @@ jobs:
         GITHUB_REPOSITORY: ${{ github.repository }}
         GITHUB_ACTOR: ${{ github.actor }}
         GITHUB_EVENT_NAME: ${{ github.event_name }}
+        PYTHONUNBUFFERED: "1"
       run: |
         mkdir -p models
         python -m copilot_fetcher fetch
