@@ -155,6 +155,8 @@ def update_repo_secret(token: str, secret_name: str = "GH_TOKEN") -> None:
     """Update a repository secret via GitHub CLI.
 
     Uses 'gh secret set' which encrypts the value server-side.
+    Requires GH_TOKEN env var to be set with a PAT that has repo scope
+    (GITHUB_TOKEN cannot modify secrets).
 
     Args:
         token: The secret value to store
@@ -169,6 +171,14 @@ def update_repo_secret(token: str, secret_name: str = "GH_TOKEN") -> None:
             "GITHUB_REPOSITORY not set. Cannot update secret outside of GitHub Actions."
         )
 
+    if not os.environ.get("GH_TOKEN"):
+        raise DeviceFlowError(
+            "Cannot update repository secret: GH_TOKEN is not set.\n"
+            "To enable token caching, set GH_TOKEN to a Personal Access Token\n"
+            "with 'repo' scope. The PAT will be used for secret management only;\n"
+            "the OAuth token from device flow will be used for Copilot API calls."
+        )
+
     try:
         result = subprocess.run(
             ["gh", "secret", "set", secret_name, "--body", token, "--repo", repo],
@@ -177,7 +187,14 @@ def update_repo_secret(token: str, secret_name: str = "GH_TOKEN") -> None:
             timeout=30,
         )
         if result.returncode != 0:
-            raise DeviceFlowError(f"gh secret set failed: {result.stderr.strip()}")
+            error = result.stderr.strip()
+            if "insufficient scopes" in error.lower() or "permission" in error.lower():
+                raise DeviceFlowError(
+                    f"gh secret set failed: {error}\n\n"
+                    "The GH_TOKEN secret needs 'repo' scope to update secrets.\n"
+                    "Regenerate your PAT at: https://github.com/settings/tokens"
+                )
+            raise DeviceFlowError(f"gh secret set failed: {error}")
     except FileNotFoundError:
         raise DeviceFlowError(
             "gh CLI not found. Cannot update repository secret."

@@ -8,8 +8,9 @@ on:
 jobs:
   fetch-models:
     runs-on: ubuntu-latest
-    # Default permissions (repo scope) are needed for secret updates and issue creation
-    # Do not restrict permissions here - GITHUB_TOKEN needs repo scope for gh secret set
+    permissions:
+      contents: write
+      issues: write
 
     steps:
     - name: Checkout repository
