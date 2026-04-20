@@ -124,26 +124,30 @@ def get_access_token(
         try:
             token = get_gh_token()
             token_type = get_token_type(token)
-            if token_type == "pat":
-                print("GitHub CLI returned a PAT, which is rejected by Copilot API")
-                if allow_device_flow and is_device_flow_available():
-                    print("Attempting device flow instead...")
-                    try:
-                        token = run_device_flow()
-                        _save_token_to_storage(storage, token)
-                        return token
-                    except DeviceFlowError as e:
-                        print(f"Device flow failed: {e}")
-                        _handle_auth_failure(
-                            allow_device_flow=allow_device_flow,
-                            reason=f"Device flow failed: {e}",
-                        )
-            else:
+            if token_type == "oauth":
                 print("Using GitHub CLI (gh) authentication")
-                print(f"  Token type: {token_type}")
+                print("  Token type: oauth")
                 print("  Accessing full Copilot model list (35+ models)")
                 _save_token_to_storage(storage, token)
                 return token
+
+            # Non-OAuth token from gh CLI (PAT or App) - also rejected
+            print(
+                f"GitHub CLI returned a {token_type} token, "
+                "which is rejected by Copilot API"
+            )
+            if allow_device_flow and is_device_flow_available():
+                print("Attempting device flow instead...")
+                try:
+                    token = run_device_flow()
+                    _save_token_to_storage(storage, token)
+                    return token
+                except DeviceFlowError as e:
+                    print(f"Device flow failed: {e}")
+                    _handle_auth_failure(
+                        allow_device_flow=allow_device_flow,
+                        reason=f"Device flow failed: {e}",
+                    )
         except GitHubCLIError:
             pass  # Fall through to device flow or error
 
