@@ -123,6 +123,9 @@ class Storage:
             data: Raw JSON dict from the API response
         """
         data["fetched_at"] = datetime.now().isoformat()
+        # API raw response doesn't include total, compute it for list display
+        if "total" not in data:
+            data["total"] = len(data.get("data", []))
 
         with open(self.models_file, "w") as f:
             json.dump(data, f, indent=2, ensure_ascii=False)

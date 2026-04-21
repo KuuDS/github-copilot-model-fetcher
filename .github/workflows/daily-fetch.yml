@@ -48,14 +48,9 @@ jobs:
         GITHUB_EVENT_NAME: ${{ github.event_name }}
         PYTHONUNBUFFERED: "1"
       run: |
-        mkdir -p models
         python -m copilot_fetcher fetch
 
-        # Copy model files for commit
-        cp ~/.copilot-fetcher/models.json models/copilot-models.json
-        cp ~/.copilot-fetcher/models.json models/copilot-models-$(date +%Y-%m-%d).json
-
-        MODEL_COUNT=$(python3 -c "import json; print(json.load(open('models/copilot-models.json')).get('total', 0))" 2>/dev/null || echo "0")
+        MODEL_COUNT=$(python3 -c "import json, os; d=json.load(open(os.path.expanduser('~/.copilot-fetcher/models.json'))); print(d.get('total', len(d.get('data', []))))" 2>/dev/null || echo "0")
         echo "count=$MODEL_COUNT" >> $GITHUB_OUTPUT
 
         # Print model list to logs
@@ -72,17 +67,27 @@ jobs:
         git config --local user.email "github-actions[bot]@users.noreply.github.com"
         git config --local user.name "github-actions[bot]"
 
-        git fetch origin
+        # Export model files to temp directory
+        mkdir -p /tmp/models-export
+        cp ~/.copilot-fetcher/models.json /tmp/models-export/copilot-models.json
+        cp ~/.copilot-fetcher/models.json "/tmp/models-export/copilot-models-$(date +%Y-%m-%d).json"
 
+        # Prepare clean release branch with only models/ directory
         if git show-ref --verify --quiet refs/remotes/origin/release; then
           git checkout release
-          git pull origin release
+          git rm -rf .
         else
-          git checkout -b release
+          git checkout --orphan release
         fi
 
-        git add models/
+        # Clean up any residual files (except .git directory)
+        find . -not -path "./.git/*" -not -path "." -delete 2>/dev/null || true
 
+        # Add model files
+        mkdir -p models
+        cp /tmp/models-export/* models/
+
+        git add models/
         if git diff --cached --quiet; then
           echo "No changes to commit"
         else
@@ -95,24 +100,6 @@ jobs:
         git tag "$TAG"
         git push origin "$TAG"
         echo "Created tag: $TAG"
-
-    - name: Create Release
-      if: success()
-      env:
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-        DATE=$(date +%Y-%m-%d)
-
-        if gh release view "v$DATE" &>/dev/null; then
-          echo "Release v$DATE already exists, updating..."
-          gh release upload "v$DATE" models/copilot-models.json --clobber
-        else
-          gh release create "v$DATE" \
-            --title "Copilot Models - $DATE" \
-            --notes "Daily snapshot of GitHub Copilot available models" \
-            models/copilot-models.json \
-            models/copilot-models-$DATE.json
-        fi
 
     - name: Workflow Summary
       if: always()
