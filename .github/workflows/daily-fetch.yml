@@ -65,38 +65,47 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        git config --local user.email "github-actions[bot]@users.noreply.github.com"
-        git config --local user.name "github-actions[bot]"
-
         # Export model files to temp directory
         mkdir -p /tmp/models-export
         cp ~/.copilot-fetcher/models.json /tmp/models-export/copilot-models.json
         cp ~/.copilot-fetcher/models.json "/tmp/models-export/copilot-models-$(date +%Y-%m-%d).json"
 
-        # Prepare clean release branch with only models/ directory
-        if git show-ref --verify --quiet refs/remotes/origin/release; then
-          git checkout release
+        # Work in a temp directory to avoid polluting the main checkout
+        cd /tmp
+        REPO_URL="https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+
+        if git ls-remote --heads "$REPO_URL" release | grep -q "refs/heads/release"; then
+          # release branch exists: clone and remove all tracked files
+          git clone --depth 1 --branch release "$REPO_URL" release-temp
+          cd release-temp
           git rm -rf .
         else
+          # create fresh orphan branch
+          git init release-temp
+          cd release-temp
+          git remote add origin "$REPO_URL"
           git checkout --orphan release
         fi
 
-        # Clean up any residual files (except .git directory)
-        find . -not -path "./.git/*" -not -path "." -delete 2>/dev/null || true
+        # Clean everything except the .git directory
+        find . -mindepth 1 -not -path './.git/*' -not -path './.git' -exec rm -rf {} + 2>/dev/null || true
 
         # Add model files
         mkdir -p models
         cp /tmp/models-export/* models/
 
+        git config user.email "github-actions[bot]@users.noreply.github.com"
+        git config user.name "github-actions[bot]"
+
         git add models/
         if git diff --cached --quiet; then
           echo "No changes to commit"
         else
-          git commit -m "Update Copilot models - $(date +%Y-%m-%d %H:%M:%S UTC)"
+          git commit -m "Update Copilot models - $(date -u +%Y-%m-%dT%H:%M:%SZ)"
           git push origin release
         fi
 
-        # Create and push tag
+        # Create and push tag from the release branch
         TAG="v$(date +%Y-%m-%d-%H%M%S)"
         git tag "$TAG"
         git push origin "$TAG"
