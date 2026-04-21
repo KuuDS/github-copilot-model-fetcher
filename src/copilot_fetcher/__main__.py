@@ -233,7 +233,7 @@ def create_notification_issue(reason: str) -> None:
         f"4. Follow the device flow instructions (link + code)\n"
         f"5. After authorization, the token will be cached automatically\n\n"
         f"**Alternative:**\n"
-        f"- Set `GH_TOKEN` to a valid OAuth token (gho_*) from `gh auth login`\n"
+        f"- Set `COPILOT_TOKEN` to a valid OAuth token (gho_*) from `gh auth login`\n"
         f"- Or run locally: `gh auth login && python -m copilot_fetcher fetch`\n\n"
         f"---\n"
         f"_This issue was created automatically by the scheduled workflow._"
