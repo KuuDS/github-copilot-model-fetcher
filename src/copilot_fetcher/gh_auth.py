@@ -22,12 +22,14 @@ class GHAuthToken:
 
 
 def get_token_from_env() -> str | None:
-    """Get token from environment variable.
+    """Get token from COPILOT_TOKEN environment variable.
 
     Returns:
-        Token string if GH_TOKEN is set, None otherwise
+        Stripped token string if COPILOT_TOKEN is set and non-empty,
+        None otherwise
     """
-    return os.environ.get("GH_TOKEN")
+    token = os.environ.get("COPILOT_TOKEN", "").strip()
+    return token if token else None
 
 
 def get_token_type(token: str) -> str:

@@ -40,7 +40,8 @@ jobs:
     - name: Fetch Copilot models
       id: fetch
       env:
-        GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        COPILOT_TOKEN: ${{ secrets.COPILOT_TOKEN }}
+        GH_PAT: ${{ secrets.GH_PAT }}
         OAUTH_CLIENT_ID: ${{ secrets.OAUTH_CLIENT_ID }}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         GITHUB_REPOSITORY: ${{ github.repository }}

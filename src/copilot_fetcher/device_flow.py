@@ -158,11 +158,11 @@ def poll_for_token(
     )
 
 
-def update_repo_secret(token: str, secret_name: str = "GH_TOKEN") -> None:
+def update_repo_secret(token: str, secret_name: str = "COPILOT_TOKEN") -> None:
     """Update a repository secret via GitHub CLI.
 
     Uses 'gh secret set' which encrypts the value server-side.
-    Requires GH_TOKEN to be a PAT with 'repo' scope.
+    Requires GH_PAT (a PAT with 'repo' scope) for authentication.
     GITHUB_TOKEN (Actions auto-provided) cannot modify secrets.
 
     Args:
@@ -178,16 +178,16 @@ def update_repo_secret(token: str, secret_name: str = "GH_TOKEN") -> None:
             "GITHUB_REPOSITORY not set. Cannot update secret outside of GitHub Actions."
         )
 
-    # GH_TOKEN must be a PAT with repo scope to update secrets.
+    # GH_PAT must be a PAT with repo scope to update secrets.
     # GITHUB_TOKEN (ghs_*) cannot write secrets.
-    auth_token = os.environ.get("GH_TOKEN")
+    auth_token = os.environ.get("GH_PAT", "").strip()
     if not auth_token:
         raise DeviceFlowError(
-            "GH_TOKEN is not set. Cannot cache OAuth token to repository secrets.\n"
+            "GH_PAT is not set. Cannot cache OAuth token to repository secrets.\n"
             "Device flow succeeded, but the token will not persist across runs.\n"
-            "To enable caching, set GH_TOKEN to a Personal Access Token with 'repo' scope:\n"
+            "To enable caching, set GH_PAT to a Personal Access Token with 'repo' scope:\n"
             "  1. https://github.com/settings/tokens/new → select 'repo'\n"
-            "  2. Add it as a repository secret named GH_TOKEN"
+            "  2. Add it as a repository secret named GH_PAT"
         )
 
     # Set up environment for gh CLI subprocess

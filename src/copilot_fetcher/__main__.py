@@ -70,13 +70,13 @@ def get_access_token(
                 print("  Warning: cached token is a PAT, which may be rejected by Copilot API")
             return stored.access_token
 
-    # 2. Check GH_TOKEN environment variable
+    # 2. Check COPILOT_TOKEN environment variable
     env_token = get_token_from_env()
     if env_token:
         token_type = get_token_type(env_token)
 
         if token_type == "oauth":
-            print("Using OAuth token from GH_TOKEN")
+            print("Using OAuth token from COPILOT_TOKEN")
             print("  Token source: environment variable (gho_)")
             print("  Model access: FULL (35+ models)")
             # Save to storage for reuse
@@ -84,14 +84,14 @@ def get_access_token(
             return env_token
 
         if token_type == "app":
-            print("Using GitHub App token from GH_TOKEN")
+            print("Using GitHub App token from COPILOT_TOKEN")
             print("  Token source: environment variable (ghs_)")
             print("  Model access: FULL (35+ models)")
             _save_token_to_storage(storage, env_token)
             return env_token
 
         if token_type == "pat":
-            print("Personal Access Token (PAT) detected in GH_TOKEN")
+            print("Personal Access Token (PAT) detected in COPILOT_TOKEN")
             print("  PATs (ghp_*) are explicitly rejected by the Copilot /models endpoint.")
 
             if allow_device_flow:
@@ -112,7 +112,7 @@ def get_access_token(
             return None
 
         # Unknown token type - try using it directly
-        print("Unknown token type in GH_TOKEN, attempting direct use...")
+        print("Unknown token type in COPILOT_TOKEN, attempting direct use...")
         _save_token_to_storage(storage, env_token)
         return env_token
 
@@ -198,7 +198,7 @@ def _handle_auth_failure(*, allow_device_flow: bool, reason: str) -> None:
     print("\nSolutions:")
     if not allow_device_flow:
         print("  1. Trigger workflow manually (workflow_dispatch) to use device flow")
-    print("  2. Set GH_TOKEN to an OAuth token (gho_*) from 'gh auth login'")
+    print("  2. Set COPILOT_TOKEN to an OAuth token (gho_*) from 'gh auth login'")
     print("  3. Run locally with: gh auth login && python -m copilot_fetcher fetch")
     print("  4. Use local scheduling (cron, systemd, launchd)")
 
@@ -377,15 +377,15 @@ def show_auth_status() -> None:
     print("\nAuthentication Status")
     print("=" * 60)
 
-    # Check GH_TOKEN env
+    # Check COPILOT_TOKEN env
     env_token = get_token_from_env()
     if env_token:
         token_type = get_token_type(env_token)
-        print(f"GH_TOKEN: set (type: {token_type})")
+        print(f"COPILOT_TOKEN: set (type: {token_type})")
         if token_type == "pat":
             print("  Warning: PAT will be rejected by Copilot API")
     else:
-        print("GH_TOKEN: not set")
+        print("COPILOT_TOKEN: not set")
 
     # Check gh CLI
     gh_available, gh_message = check_gh_auth()
