@@ -108,46 +108,6 @@
     },
     {
       "capabilities": {
-        "family": "oswe-vscode-modelD",
-        "limits": {
-          "max_context_window_tokens": 400000,
-          "max_output_tokens": 128000,
-          "max_prompt_tokens": 272000,
-          "vision": {
-            "max_prompt_image_size": 3145728,
-            "max_prompt_images": 1,
-            "supported_media_types": [
-              "image/jpeg",
-              "image/png",
-              "image/webp",
-              "image/gif"
-            ]
-          }
-        },
-        "object": "model_capabilities",
-        "supports": {
-          "parallel_tool_calls": true,
-          "streaming": true,
-          "structured_outputs": true,
-          "tool_calls": true,
-          "vision": true
-        },
-        "tokenizer": "o200k_base",
-        "type": "chat"
-      },
-      "id": "goldeneye-free-auto",
-      "model_picker_enabled": false,
-      "name": "Goldeneye",
-      "object": "model",
-      "preview": true,
-      "supported_endpoints": [
-        "/responses"
-      ],
-      "vendor": "",
-      "version": "goldeneye-free-auto"
-    },
-    {
-      "capabilities": {
         "family": "gpt-5.2-codex",
         "limits": {
           "max_context_window_tokens": 400000,
@@ -1215,6 +1175,6 @@
     }
   ],
   "object": "list",
-  "fetched_at": "2026-04-22T00:08:03.427334",
-  "total": 33
+  "fetched_at": "2026-04-23T00:12:56.915610",
+  "total": 32
 }
