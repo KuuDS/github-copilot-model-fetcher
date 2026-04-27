@@ -60,6 +60,15 @@ jobs:
         python -m copilot_fetcher list
         echo "======================"
 
+    - name: Generate LiteLLM configs
+      if: success()
+      run: |
+        python -m copilot_fetcher litellm-config \
+          --output ~/.copilot-fetcher/litellm-config.yaml
+        python -m copilot_fetcher litellm-config --format json \
+          --output ~/.copilot-fetcher/litellm-config.json
+        echo "Generated LiteLLM configs"
+
     - name: Commit to release branch
       if: success()
       env:
@@ -69,6 +78,8 @@ jobs:
         mkdir -p /tmp/models-export
         cp ~/.copilot-fetcher/models.json /tmp/models-export/copilot-models.json
         cp ~/.copilot-fetcher/models.json "/tmp/models-export/copilot-models-$(date +%Y-%m-%d).json"
+        cp ~/.copilot-fetcher/litellm-config.yaml /tmp/models-export/litellm-config.yaml
+        cp ~/.copilot-fetcher/litellm-config.json /tmp/models-export/litellm-config.json
 
         # Work in a temp directory to avoid polluting the main checkout
         cd /tmp
@@ -122,6 +133,7 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "- Models fetched: ${{ steps.fetch.outputs.count }}" >> $GITHUB_STEP_SUMMARY
           echo "- Timestamp: $(date -u +%Y-%m-%dT%H:%M:%SZ)" >> $GITHUB_STEP_SUMMARY
+          echo "- Config files: litellm-config.yaml, litellm-config.json" >> $GITHUB_STEP_SUMMARY
         else
           echo "Fetch Failed" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY

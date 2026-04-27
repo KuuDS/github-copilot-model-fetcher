@@ -206,9 +206,7 @@ def update_repo_secret(token: str, secret_name: str = "COPILOT_TOKEN") -> None:
             error = result.stderr.strip()
             raise DeviceFlowError(f"gh secret set failed: {error}")
     except FileNotFoundError:
-        raise DeviceFlowError(
-            "gh CLI not found. Cannot update repository secret."
-        )
+        raise DeviceFlowError("gh CLI not found. Cannot update repository secret.")
     except subprocess.TimeoutExpired:
         raise DeviceFlowError("Timeout updating repository secret")
 

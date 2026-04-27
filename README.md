@@ -120,6 +120,51 @@ Total: 35 models
 ./run.sh raw
 ```
 
+### Generate LiteLLM config
+
+```bash
+# Generate YAML config (default)
+./run.sh litellm-config --output ~/.copilot-fetcher/litellm-config.yaml
+
+# Generate JSON config
+./run.sh litellm-config --format json --output ~/.copilot-fetcher/litellm-config.json
+
+# Customize API key environment variable
+./run.sh litellm-config --api-key-env MY_GITHUB_TOKEN
+```
+
+Example output (`litellm-config.yaml`):
+
+```yaml
+model_list:
+  - model_name: gpt-4o
+    litellm_params:
+      model: github/gpt-4o
+      api_key: os.environ/GITHUB_TOKEN
+    model_info:
+      id: gpt-4o
+      name: GPT-4o
+      description: OpenAI GPT-4o model
+      capabilities:
+        vision: true
+        tools: true
+  - model_name: claude-sonnet-4
+    litellm_params:
+      model: github/claude-sonnet-4
+      api_key: os.environ/GITHUB_TOKEN
+    model_info:
+      id: claude-sonnet-4
+      name: Claude Sonnet 4
+      ...
+```
+
+Use with [LiteLLM](https://github.com/BerriAI/litellm):
+
+```bash
+# Start LiteLLM proxy with the generated config
+litellm --config ~/.copilot-fetcher/litellm-config.yaml
+```
+
 ### Launch TUI mode
 
 ```bash
@@ -194,6 +239,7 @@ with CopilotClient(token) as client:
 - `copilot_fetcher.storage` - Local data storage
 - `copilot_fetcher.device_flow` - OAuth device flow (RFC 8628)
 - `copilot_fetcher.tui` - Interactive terminal UI
+- `copilot_fetcher.litellm_config` - LiteLLM configuration generator
 
 ## GitHub Actions Setup
 
@@ -290,6 +336,8 @@ jobs:
 The `release` branch contains **only** the `models/` directory:
 - `models/copilot-models.json` — Latest model list
 - `models/copilot-models-YYYY-MM-DD.json` — Dated snapshot
+- `models/litellm-config.yaml` — LiteLLM configuration (YAML)
+- `models/litellm-config.json` — LiteLLM configuration (JSON)
 
 Each successful run also creates a git tag: `vYYYY-MM-DD-HHMMSS`
 
@@ -382,7 +430,8 @@ If device flow succeeds but shows "Could not cache token", check that:
 │       ├── storage.py         # Local data storage
 │       ├── device_flow.py     # OAuth device flow (RFC 8628)
 │       ├── tui.py             # Interactive terminal UI
-│       └── copilot_cli.py     # Copilot CLI utilities
+│       ├── copilot_cli.py     # Copilot CLI utilities
+│       └── litellm_config.py  # LiteLLM config generator
 ├── .github/
 │   └── workflows/
 │       └── daily-fetch.yml    # GitHub Actions workflow
