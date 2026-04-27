@@ -20,6 +20,7 @@ from copilot_fetcher.gh_auth import (
     get_token_from_env,
     get_token_type,
 )
+from copilot_fetcher.litellm_config import LiteLLMConfigGenerator, write_config
 from copilot_fetcher.storage import Storage, StoredToken
 
 # Global start time for execution timeout check
@@ -130,10 +131,7 @@ def get_access_token(
                 return token
 
             # Non-OAuth token from gh CLI (PAT or App) - also rejected
-            print(
-                f"GitHub CLI returned a {token_type} token, "
-                "which is rejected by Copilot API"
-            )
+            print(f"GitHub CLI returned a {token_type} token, which is rejected by Copilot API")
             if allow_device_flow:
                 print("Attempting device flow instead...")
                 try:
@@ -400,6 +398,54 @@ def show_auth_status() -> None:
     print("\n" + "=" * 60)
 
 
+def generate_litellm_config_command(
+    storage: Storage,
+    format: str = "yaml",
+    output: Path | None = None,
+    api_key_env: str = "GITHUB_TOKEN",
+    api_base: str | None = None,
+) -> None:
+    """Generate LiteLLM config from stored models.
+
+    Args:
+        storage: Storage instance
+        format: Output format (yaml or json)
+        output: Output file path (None for stdout)
+        api_key_env: Environment variable name for API key
+        api_base: Optional API base URL
+    """
+    raw_data = storage.get_raw_models()
+    if not raw_data:
+        print("No models found. Run 'copilot-fetcher fetch' first.")
+        sys.exit(1)
+
+    models = raw_data.get("data", [])
+    if not models:
+        print("No models found in stored data.")
+        sys.exit(1)
+
+    generator = LiteLLMConfigGenerator(
+        api_key_env=api_key_env,
+        api_base=api_base,
+    )
+    config = generator.generate(models)
+
+    if format == "yaml":
+        config_str = generator.to_yaml(config)
+    elif format == "json":
+        config_str = generator.to_json(config)
+    else:
+        print(f"Error: Unsupported format '{format}'")
+        sys.exit(1)
+
+    if output:
+        written_path = write_config(config_str, output)
+        print(f"Generated LiteLLM config ({format}): {written_path}")
+        print(f"  Models: {len(config['model_list'])}")
+    else:
+        print(config_str)
+
+
 def main() -> int:
     """Main entry point."""
     parser = argparse.ArgumentParser(
@@ -468,6 +514,34 @@ def main() -> int:
         help="Clear stored authentication and data",
     )
 
+    # LiteLLM config command
+    litellm_parser = subparsers.add_parser(
+        "litellm-config",
+        help="Generate LiteLLM configuration file",
+    )
+    litellm_parser.add_argument(
+        "--format",
+        choices=["yaml", "json"],
+        default="yaml",
+        help="Output format (default: yaml)",
+    )
+    litellm_parser.add_argument(
+        "--output",
+        type=Path,
+        default=None,
+        help="Output file path (default: stdout)",
+    )
+    litellm_parser.add_argument(
+        "--api-key-env",
+        default="GITHUB_TOKEN",
+        help="Environment variable name for API key (default: GITHUB_TOKEN)",
+    )
+    litellm_parser.add_argument(
+        "--api-base",
+        default=None,
+        help="Optional API base URL",
+    )
+
     args = parser.parse_args()
 
     if not args.command:
@@ -508,6 +582,15 @@ def main() -> int:
         if storage.models_file.exists():
             storage.models_file.unlink()
         print("Cleared all stored data")
+
+    elif args.command == "litellm-config":
+        generate_litellm_config_command(
+            storage,
+            format=args.format,
+            output=args.output,
+            api_key_env=args.api_key_env,
+            api_base=args.api_base,
+        )
 
     return 0
 
