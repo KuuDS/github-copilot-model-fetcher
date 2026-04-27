@@ -1,0 +1,914 @@
+model_list:
+- model_name: claude-opus-4.7
+  litellm_params:
+    model: github/claude-opus-4.7
+    api_key: os.environ/GITHUB_TOKEN
+  model_info:
+    id: claude-opus-4.7
+    name: Claude Opus 4.7
+    capabilities:
+      family: claude-opus-4.7
+      limits:
+        max_context_window_tokens: 144000
+        max_non_streaming_output_tokens: 16000
+        max_output_tokens: 64000
+        max_prompt_tokens: 128000
+        vision:
+          max_prompt_image_size: 3145728
+          max_prompt_images: 1
+          supported_media_types:
+          - image/jpeg
+          - image/png
+          - image/webp
+      object: model_capabilities
+      supports:
+        adaptive_thinking: true
+        max_thinking_budget: 32000
+        min_thinking_budget: 1024
+        parallel_tool_calls: true
+        reasoning_effort:
+        - medium
+        streaming: true
+        structured_outputs: true
+        tool_calls: true
+        vision: true
+      tokenizer: o200k_base
+      type: chat
+    version: claude-opus-4.7
+- model_name: claude-sonnet-4.6
+  litellm_params:
+    model: github/claude-sonnet-4.6
+    api_key: os.environ/GITHUB_TOKEN
+  model_info:
+    id: claude-sonnet-4.6
+    name: Claude Sonnet 4.6
+    capabilities:
+      family: claude-sonnet-4.6
+      limits:
+        max_context_window_tokens: 200000
+        max_non_streaming_output_tokens: 16000
+        max_output_tokens: 32000
+        max_prompt_tokens: 128000
+        vision:
+          max_prompt_image_size: 3145728
+          max_prompt_images: 5
+          supported_media_types:
+          - image/jpeg
+          - image/png
+          - image/webp
+      object: model_capabilities
+      supports:
+        adaptive_thinking: true
+        max_thinking_budget: 32000
+        min_thinking_budget: 1024
+        parallel_tool_calls: true
+        reasoning_effort:
+        - low
+        - medium
+        - high
+        streaming: true
+        structured_outputs: true
+        tool_calls: true
+        vision: true
+      tokenizer: o200k_base
+      type: chat
+    version: claude-sonnet-4.6
+- model_name: gpt-5.2-codex
+  litellm_params:
+    model: github/gpt-5.2-codex
+    api_key: os.environ/GITHUB_TOKEN
+  model_info:
+    id: gpt-5.2-codex
+    name: GPT-5.2-Codex
+    capabilities:
+      family: gpt-5.2-codex
+      limits:
+        max_context_window_tokens: 400000
+        max_output_tokens: 128000
+        max_prompt_tokens: 272000
+        vision:
+          max_prompt_image_size: 3145728
+          max_prompt_images: 1
+          supported_media_types:
+          - image/jpeg
+          - image/png
+          - image/webp
+          - image/gif
+      object: model_capabilities
+      supports:
+        parallel_tool_calls: true
+        reasoning_effort:
+        - low
+        - medium
+        - high
+        - xhigh
+        streaming: true
+        structured_outputs: true
+        tool_calls: true
+        vision: true
+      tokenizer: o200k_base
+      type: chat
+    version: gpt-5.2-codex
+- model_name: gpt-5.3-codex
+  litellm_params:
+    model: github/gpt-5.3-codex
+    api_key: os.environ/GITHUB_TOKEN
+  model_info:
+    id: gpt-5.3-codex
+    name: GPT-5.3-Codex
+    capabilities:
+      family: gpt-5.3-codex
+      limits:
+        max_context_window_tokens: 400000
+        max_output_tokens: 128000
+        max_prompt_tokens: 272000
+        vision:
+          max_prompt_image_size: 3145728
+          max_prompt_images: 1
+          supported_media_types:
+          - image/jpeg
+          - image/png
+          - image/webp
+          - image/gif
+      object: model_capabilities
+      supports:
+        parallel_tool_calls: true
+        reasoning_effort:
+        - low
+        - medium
+        - high
+        - xhigh
+        streaming: true
+        structured_outputs: true
+        tool_calls: true
+        vision: true
+      tokenizer: o200k_base
+      type: chat
+    version: gpt-5.3-codex
+- model_name: gpt-5.4-mini
+  litellm_params:
+    model: github/gpt-5.4-mini
+    api_key: os.environ/GITHUB_TOKEN
+  model_info:
+    id: gpt-5.4-mini
+    name: GPT-5.4 mini
+    capabilities:
+      family: gpt-5.4-mini
+      limits:
+        max_context_window_tokens: 400000
+        max_output_tokens: 128000
+        max_prompt_tokens: 272000
+        vision:
+          max_prompt_image_size: 3145728
+          max_prompt_images: 1
+          supported_media_types:
+          - image/jpeg
+          - image/png
+          - image/webp
+          - image/gif
+      object: model_capabilities
+      supports:
+        parallel_tool_calls: true
+        reasoning_effort:
+        - none
+        - low
+        - medium
+        - high
+        - xhigh
+        streaming: true
+        structured_outputs: true
+        tool_calls: true
+        vision: true
+      tokenizer: o200k_base
+      type: chat
+    version: gpt-5.4-mini
+- model_name: gpt-5.4
+  litellm_params:
+    model: github/gpt-5.4
+    api_key: os.environ/GITHUB_TOKEN
+  model_info:
+    id: gpt-5.4
+    name: GPT-5.4
+    capabilities:
+      family: gpt-5.4
+      limits:
+        max_context_window_tokens: 400000
+        max_output_tokens: 128000
+        max_prompt_tokens: 272000
+        vision:
+          max_prompt_image_size: 3145728
+          max_prompt_images: 1
+          supported_media_types:
+          - image/jpeg
+          - image/png
+          - image/webp
+          - image/gif
+      object: model_capabilities
+      supports:
+        parallel_tool_calls: true
+        reasoning_effort:
+        - low
+        - medium
+        - high
+        - xhigh
+        streaming: true
+        structured_outputs: true
+        tool_calls: true
+        vision: true
+      tokenizer: o200k_base
+      type: chat
+    version: gpt-5.4
+- model_name: gpt-5.5
+  litellm_params:
+    model: github/gpt-5.5
+    api_key: os.environ/GITHUB_TOKEN
+  model_info:
+    id: gpt-5.5
+    name: GPT-5.5
+    capabilities:
+      family: gpt-5.5
+      limits:
+        max_context_window_tokens: 400000
+        max_output_tokens: 128000
+        max_prompt_tokens: 272000
+        vision:
+          max_prompt_image_size: 3145728
+          max_prompt_images: 1
+          supported_media_types:
+          - image/jpeg
+          - image/png
+          - image/webp
+          - image/gif
+      object: model_capabilities
+      supports:
+        parallel_tool_calls: true
+        reasoning_effort:
+        - none
+        - low
+        - medium
+        - high
+        - xhigh
+        streaming: true
+        structured_outputs: true
+        tool_calls: true
+        vision: true
+      tokenizer: o200k_base
+      type: chat
+    version: gpt-5.5
+- model_name: gpt-5-mini
+  litellm_params:
+    model: github/gpt-5-mini
+    api_key: os.environ/GITHUB_TOKEN
+  model_info:
+    id: gpt-5-mini
+    name: GPT-5 mini
+    capabilities:
+      family: gpt-5-mini
+      limits:
+        max_context_window_tokens: 264000
+        max_output_tokens: 64000
+        max_prompt_tokens: 128000
+        vision:
+          max_prompt_image_size: 3145728
+          max_prompt_images: 1
+          supported_media_types:
+          - image/jpeg
+          - image/png
+          - image/webp
+          - image/gif
+      object: model_capabilities
+      supports:
+        parallel_tool_calls: true
+        reasoning_effort:
+        - low
+        - medium
+        - high
+        streaming: true
+        structured_outputs: true
+        tool_calls: true
+        vision: true
+      tokenizer: o200k_base
+      type: chat
+    version: gpt-5-mini
+- model_name: gpt-4o-mini-2024-07-18
+  litellm_params:
+    model: github/gpt-4o-mini-2024-07-18
+    api_key: os.environ/GITHUB_TOKEN
+  model_info:
+    id: gpt-4o-mini-2024-07-18
+    name: GPT-4o mini
+    capabilities:
+      family: gpt-4o-mini
+      limits:
+        max_context_window_tokens: 128000
+        max_output_tokens: 4096
+        max_prompt_tokens: 64000
+      object: model_capabilities
+      supports:
+        parallel_tool_calls: true
+        streaming: true
+        tool_calls: true
+      tokenizer: o200k_base
+      type: chat
+    version: gpt-4o-mini-2024-07-18
+- model_name: gpt-4o-2024-11-20
+  litellm_params:
+    model: github/gpt-4o-2024-11-20
+    api_key: os.environ/GITHUB_TOKEN
+  model_info:
+    id: gpt-4o-2024-11-20
+    name: GPT-4o
+    capabilities:
+      family: gpt-4o
+      limits:
+        max_context_window_tokens: 128000
+        max_output_tokens: 16384
+        max_prompt_tokens: 64000
+        vision:
+          max_prompt_image_size: 3145728
+          max_prompt_images: 1
+          supported_media_types:
+          - image/jpeg
+          - image/png
+          - image/webp
+          - image/gif
+      object: model_capabilities
+      supports:
+        parallel_tool_calls: true
+        streaming: true
+        tool_calls: true
+        vision: true
+      tokenizer: o200k_base
+      type: chat
+    version: gpt-4o-2024-11-20
+- model_name: gpt-4o-2024-08-06
+  litellm_params:
+    model: github/gpt-4o-2024-08-06
+    api_key: os.environ/GITHUB_TOKEN
+  model_info:
+    id: gpt-4o-2024-08-06
+    name: GPT-4o
+    capabilities:
+      family: gpt-4o
+      limits:
+        max_context_window_tokens: 128000
+        max_output_tokens: 16384
+        max_prompt_tokens: 64000
+      object: model_capabilities
+      supports:
+        parallel_tool_calls: true
+        streaming: true
+        tool_calls: true
+      tokenizer: o200k_base
+      type: chat
+    version: gpt-4o-2024-08-06
+- model_name: grok-code-fast-1
+  litellm_params:
+    model: github/grok-code-fast-1
+    api_key: os.environ/GITHUB_TOKEN
+  model_info:
+    id: grok-code-fast-1
+    name: Grok Code Fast 1
+    capabilities:
+      family: grok-code
+      limits:
+        max_context_window_tokens: 128000
+        max_output_tokens: 64000
+        max_prompt_tokens: 128000
+      object: model_capabilities
+      supports:
+        streaming: true
+        structured_outputs: true
+        tool_calls: true
+      tokenizer: o200k_base
+      type: chat
+    version: grok-code-fast-1
+- model_name: text-embedding-3-small
+  litellm_params:
+    model: github/text-embedding-3-small
+    api_key: os.environ/GITHUB_TOKEN
+  model_info:
+    id: text-embedding-3-small
+    name: Embedding V3 small
+    capabilities:
+      family: text-embedding-3-small
+      limits:
+        max_inputs: 512
+      object: model_capabilities
+      supports:
+        dimensions: true
+      tokenizer: cl100k_base
+      type: embeddings
+    version: text-embedding-3-small
+- model_name: text-embedding-3-small-inference
+  litellm_params:
+    model: github/text-embedding-3-small-inference
+    api_key: os.environ/GITHUB_TOKEN
+  model_info:
+    id: text-embedding-3-small-inference
+    name: Embedding V3 small (Inference)
+    capabilities:
+      family: text-embedding-3-small
+      object: model_capabilities
+      supports:
+        dimensions: true
+      tokenizer: cl100k_base
+      type: embeddings
+    version: text-embedding-3-small
+- model_name: claude-sonnet-4
+  litellm_params:
+    model: github/claude-sonnet-4
+    api_key: os.environ/GITHUB_TOKEN
+  model_info:
+    id: claude-sonnet-4
+    name: Claude Sonnet 4
+    capabilities:
+      family: claude-sonnet-4
+      limits:
+        max_context_window_tokens: 216000
+        max_output_tokens: 16000
+        max_prompt_tokens: 128000
+        vision:
+          max_prompt_image_size: 3145728
+          max_prompt_images: 5
+          supported_media_types:
+          - image/jpeg
+          - image/png
+          - image/webp
+      object: model_capabilities
+      supports:
+        max_thinking_budget: 32000
+        min_thinking_budget: 1024
+        parallel_tool_calls: true
+        streaming: true
+        tool_calls: true
+        vision: true
+      tokenizer: o200k_base
+      type: chat
+    version: claude-sonnet-4
+- model_name: claude-sonnet-4.5
+  litellm_params:
+    model: github/claude-sonnet-4.5
+    api_key: os.environ/GITHUB_TOKEN
+  model_info:
+    id: claude-sonnet-4.5
+    name: Claude Sonnet 4.5
+    capabilities:
+      family: claude-sonnet-4.5
+      limits:
+        max_context_window_tokens: 144000
+        max_non_streaming_output_tokens: 16000
+        max_output_tokens: 32000
+        max_prompt_tokens: 128000
+        vision:
+          max_prompt_image_size: 3145728
+          max_prompt_images: 5
+          supported_media_types:
+          - image/jpeg
+          - image/png
+          - image/webp
+      object: model_capabilities
+      supports:
+        max_thinking_budget: 32000
+        min_thinking_budget: 1024
+        parallel_tool_calls: true
+        streaming: true
+        tool_calls: true
+        vision: true
+      tokenizer: o200k_base
+      type: chat
+    version: claude-sonnet-4.5
+- model_name: claude-opus-4.5
+  litellm_params:
+    model: github/claude-opus-4.5
+    api_key: os.environ/GITHUB_TOKEN
+  model_info:
+    id: claude-opus-4.5
+    name: Claude Opus 4.5
+    capabilities:
+      family: claude-opus-4.5
+      limits:
+        max_context_window_tokens: 160000
+        max_non_streaming_output_tokens: 16000
+        max_output_tokens: 32000
+        max_prompt_tokens: 128000
+        vision:
+          max_prompt_image_size: 3145728
+          max_prompt_images: 5
+          supported_media_types:
+          - image/jpeg
+          - image/png
+          - image/webp
+      object: model_capabilities
+      supports:
+        max_thinking_budget: 32000
+        min_thinking_budget: 1024
+        parallel_tool_calls: true
+        streaming: true
+        tool_calls: true
+        vision: true
+      tokenizer: o200k_base
+      type: chat
+    version: claude-opus-4.5
+- model_name: claude-haiku-4.5
+  litellm_params:
+    model: github/claude-haiku-4.5
+    api_key: os.environ/GITHUB_TOKEN
+  model_info:
+    id: claude-haiku-4.5
+    name: Claude Haiku 4.5
+    capabilities:
+      family: claude-haiku-4.5
+      limits:
+        max_context_window_tokens: 144000
+        max_non_streaming_output_tokens: 16000
+        max_output_tokens: 32000
+        max_prompt_tokens: 128000
+        vision:
+          max_prompt_image_size: 3145728
+          max_prompt_images: 5
+          supported_media_types:
+          - image/jpeg
+          - image/png
+          - image/webp
+      object: model_capabilities
+      supports:
+        max_thinking_budget: 32000
+        min_thinking_budget: 1024
+        parallel_tool_calls: true
+        streaming: true
+        tool_calls: true
+        vision: true
+      tokenizer: o200k_base
+      type: chat
+    version: claude-haiku-4.5
+- model_name: gemini-2.5-pro
+  litellm_params:
+    model: github/gemini-2.5-pro
+    api_key: os.environ/GITHUB_TOKEN
+  model_info:
+    id: gemini-2.5-pro
+    name: Gemini 2.5 Pro
+    capabilities:
+      family: gemini-2.5-pro
+      limits:
+        max_context_window_tokens: 128000
+        max_output_tokens: 64000
+        max_prompt_tokens: 128000
+        vision:
+          max_prompt_image_size: 3145728
+          max_prompt_images: 10
+          supported_media_types:
+          - image/jpeg
+          - image/png
+          - image/webp
+          - image/heic
+          - image/heif
+      object: model_capabilities
+      supports:
+        max_thinking_budget: 32768
+        min_thinking_budget: 128
+        parallel_tool_calls: true
+        streaming: true
+        tool_calls: true
+        vision: true
+      tokenizer: o200k_base
+      type: chat
+    version: gemini-2.5-pro
+- model_name: gpt-4.1-2025-04-14
+  litellm_params:
+    model: github/gpt-4.1-2025-04-14
+    api_key: os.environ/GITHUB_TOKEN
+  model_info:
+    id: gpt-4.1-2025-04-14
+    name: GPT-4.1
+    capabilities:
+      family: gpt-4.1
+      limits:
+        max_context_window_tokens: 128000
+        max_output_tokens: 16384
+        max_prompt_tokens: 64000
+        vision:
+          max_prompt_image_size: 3145728
+          max_prompt_images: 1
+          supported_media_types:
+          - image/jpeg
+          - image/png
+          - image/webp
+          - image/gif
+      object: model_capabilities
+      supports:
+        parallel_tool_calls: true
+        streaming: true
+        structured_outputs: true
+        tool_calls: true
+        vision: true
+      tokenizer: o200k_base
+      type: chat
+    version: gpt-4.1-2025-04-14
+- model_name: gpt-5.2
+  litellm_params:
+    model: github/gpt-5.2
+    api_key: os.environ/GITHUB_TOKEN
+  model_info:
+    id: gpt-5.2
+    name: GPT-5.2
+    capabilities:
+      family: gpt-5.2
+      limits:
+        max_context_window_tokens: 264000
+        max_output_tokens: 64000
+        max_prompt_tokens: 128000
+        vision:
+          max_prompt_image_size: 3145728
+          max_prompt_images: 1
+          supported_media_types:
+          - image/jpeg
+          - image/png
+          - image/webp
+          - image/gif
+      object: model_capabilities
+      supports:
+        parallel_tool_calls: true
+        reasoning_effort:
+        - low
+        - medium
+        - high
+        - xhigh
+        streaming: true
+        structured_outputs: true
+        tool_calls: true
+        vision: true
+      tokenizer: o200k_base
+      type: chat
+    version: gpt-5.2
+- model_name: gpt-3.5-turbo-0613
+  litellm_params:
+    model: github/gpt-3.5-turbo-0613
+    api_key: os.environ/GITHUB_TOKEN
+  model_info:
+    id: gpt-3.5-turbo-0613
+    name: GPT 3.5 Turbo
+    capabilities:
+      family: gpt-3.5-turbo
+      limits:
+        max_context_window_tokens: 16384
+        max_output_tokens: 4096
+        max_prompt_tokens: 16384
+      object: model_capabilities
+      supports:
+        streaming: true
+        tool_calls: true
+      tokenizer: cl100k_base
+      type: chat
+    version: gpt-3.5-turbo-0613
+- model_name: gpt-4
+  litellm_params:
+    model: github/gpt-4
+    api_key: os.environ/GITHUB_TOKEN
+  model_info:
+    id: gpt-4
+    name: GPT 4
+    capabilities:
+      family: gpt-4
+      limits:
+        max_context_window_tokens: 32768
+        max_output_tokens: 4096
+        max_prompt_tokens: 32768
+      object: model_capabilities
+      supports:
+        streaming: true
+        tool_calls: true
+      tokenizer: cl100k_base
+      type: chat
+    version: gpt-4-0613
+- model_name: gpt-4-0613
+  litellm_params:
+    model: github/gpt-4-0613
+    api_key: os.environ/GITHUB_TOKEN
+  model_info:
+    id: gpt-4-0613
+    name: GPT 4
+    capabilities:
+      family: gpt-4
+      limits:
+        max_context_window_tokens: 32768
+        max_output_tokens: 4096
+        max_prompt_tokens: 32768
+      object: model_capabilities
+      supports:
+        streaming: true
+        tool_calls: true
+      tokenizer: cl100k_base
+      type: chat
+    version: gpt-4-0613
+- model_name: gpt-4o-2024-05-13
+  litellm_params:
+    model: github/gpt-4o-2024-05-13
+    api_key: os.environ/GITHUB_TOKEN
+  model_info:
+    id: gpt-4o-2024-05-13
+    name: GPT-4o
+    capabilities:
+      family: gpt-4o
+      limits:
+        max_context_window_tokens: 128000
+        max_output_tokens: 4096
+        max_prompt_tokens: 64000
+        vision:
+          max_prompt_image_size: 3145728
+          max_prompt_images: 1
+          supported_media_types:
+          - image/jpeg
+          - image/png
+          - image/webp
+          - image/gif
+      object: model_capabilities
+      supports:
+        parallel_tool_calls: true
+        streaming: true
+        tool_calls: true
+        vision: true
+      tokenizer: o200k_base
+      type: chat
+    version: gpt-4o-2024-05-13
+- model_name: gpt-4-o-preview
+  litellm_params:
+    model: github/gpt-4-o-preview
+    api_key: os.environ/GITHUB_TOKEN
+  model_info:
+    id: gpt-4-o-preview
+    name: GPT-4o
+    capabilities:
+      family: gpt-4o
+      limits:
+        max_context_window_tokens: 128000
+        max_output_tokens: 4096
+        max_prompt_tokens: 64000
+      object: model_capabilities
+      supports:
+        parallel_tool_calls: true
+        streaming: true
+        tool_calls: true
+      tokenizer: o200k_base
+      type: chat
+    version: gpt-4o-2024-05-13
+- model_name: gpt-4.1
+  litellm_params:
+    model: github/gpt-4.1
+    api_key: os.environ/GITHUB_TOKEN
+  model_info:
+    id: gpt-4.1
+    name: GPT-4.1
+    capabilities:
+      family: gpt-4.1
+      limits:
+        max_context_window_tokens: 128000
+        max_output_tokens: 16384
+        max_prompt_tokens: 64000
+        vision:
+          max_prompt_image_size: 3145728
+          max_prompt_images: 1
+          supported_media_types:
+          - image/jpeg
+          - image/png
+          - image/webp
+          - image/gif
+      object: model_capabilities
+      supports:
+        parallel_tool_calls: true
+        streaming: true
+        structured_outputs: true
+        tool_calls: true
+        vision: true
+      tokenizer: o200k_base
+      type: chat
+    version: gpt-4.1-2025-04-14
+- model_name: gpt-3.5-turbo
+  litellm_params:
+    model: github/gpt-3.5-turbo
+    api_key: os.environ/GITHUB_TOKEN
+  model_info:
+    id: gpt-3.5-turbo
+    name: GPT 3.5 Turbo
+    capabilities:
+      family: gpt-3.5-turbo
+      limits:
+        max_context_window_tokens: 16384
+        max_output_tokens: 4096
+        max_prompt_tokens: 16384
+      object: model_capabilities
+      supports:
+        streaming: true
+        tool_calls: true
+      tokenizer: cl100k_base
+      type: chat
+    version: gpt-3.5-turbo-0613
+- model_name: gpt-4o-mini
+  litellm_params:
+    model: github/gpt-4o-mini
+    api_key: os.environ/GITHUB_TOKEN
+  model_info:
+    id: gpt-4o-mini
+    name: GPT-4o mini
+    capabilities:
+      family: gpt-4o-mini
+      limits:
+        max_context_window_tokens: 128000
+        max_output_tokens: 4096
+        max_prompt_tokens: 64000
+      object: model_capabilities
+      supports:
+        parallel_tool_calls: true
+        streaming: true
+        tool_calls: true
+      tokenizer: o200k_base
+      type: chat
+    version: gpt-4o-mini-2024-07-18
+- model_name: gpt-4
+  litellm_params:
+    model: github/gpt-4
+    api_key: os.environ/GITHUB_TOKEN
+  model_info:
+    id: gpt-4
+    name: GPT 4
+    capabilities:
+      family: gpt-4
+      limits:
+        max_context_window_tokens: 32768
+        max_output_tokens: 4096
+        max_prompt_tokens: 32768
+      object: model_capabilities
+      supports:
+        streaming: true
+        tool_calls: true
+      tokenizer: cl100k_base
+      type: chat
+    version: gpt-4-0613
+- model_name: gpt-4o
+  litellm_params:
+    model: github/gpt-4o
+    api_key: os.environ/GITHUB_TOKEN
+  model_info:
+    id: gpt-4o
+    name: GPT-4o
+    capabilities:
+      family: gpt-4o
+      limits:
+        max_context_window_tokens: 128000
+        max_output_tokens: 4096
+        max_prompt_tokens: 64000
+        vision:
+          max_prompt_image_size: 3145728
+          max_prompt_images: 1
+          supported_media_types:
+          - image/jpeg
+          - image/png
+          - image/webp
+          - image/gif
+      object: model_capabilities
+      supports:
+        parallel_tool_calls: true
+        streaming: true
+        tool_calls: true
+        vision: true
+      tokenizer: o200k_base
+      type: chat
+    version: gpt-4o-2024-11-20
+- model_name: gpt-4-o-preview
+  litellm_params:
+    model: github/gpt-4-o-preview
+    api_key: os.environ/GITHUB_TOKEN
+  model_info:
+    id: gpt-4-o-preview
+    name: GPT-4o
+    capabilities:
+      family: gpt-4o
+      limits:
+        max_context_window_tokens: 128000
+        max_output_tokens: 4096
+        max_prompt_tokens: 64000
+      object: model_capabilities
+      supports:
+        parallel_tool_calls: true
+        streaming: true
+        tool_calls: true
+      tokenizer: o200k_base
+      type: chat
+    version: gpt-4o-2024-05-13
+- model_name: text-embedding-ada-002
+  litellm_params:
+    model: github/text-embedding-ada-002
+    api_key: os.environ/GITHUB_TOKEN
+  model_info:
+    id: text-embedding-ada-002
+    name: Embedding V2 Ada
+    capabilities:
+      family: text-embedding-ada-002
+      limits:
+        max_inputs: 512
+      object: model_capabilities
+      supports: {}
+      tokenizer: cl100k_base
+      type: embeddings
+    version: text-embedding-3-small
