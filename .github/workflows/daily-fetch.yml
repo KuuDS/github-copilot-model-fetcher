@@ -77,7 +77,6 @@ jobs:
         # Export model files to temp directory
         mkdir -p /tmp/models-export
         cp ~/.copilot-fetcher/models.json /tmp/models-export/copilot-models.json
-        cp ~/.copilot-fetcher/models.json "/tmp/models-export/copilot-models-$(date +%Y-%m-%d).json"
         cp ~/.copilot-fetcher/litellm-config.yaml /tmp/models-export/litellm-config.yaml
         cp ~/.copilot-fetcher/litellm-config.json /tmp/models-export/litellm-config.json
 
