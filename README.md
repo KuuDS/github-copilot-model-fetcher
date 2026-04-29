@@ -333,11 +333,15 @@ jobs:
 
 ### Release Branch
 
-The `release` branch contains **only** the `models/` directory:
+The `release` branch contains the following directories:
+
+**`models/`** — Model data:
 - `models/copilot-models.json` — Latest model list
 - `models/copilot-models-YYYY-MM-DD.json` — Dated snapshot
-- `models/litellm-config.yaml` — LiteLLM configuration (YAML)
-- `models/litellm-config.json` — LiteLLM configuration (JSON)
+
+**`litellm/`** — LiteLLM configuration files:
+- `litellm/litellm-config.yaml` — LiteLLM configuration (YAML)
+- `litellm/litellm-config.json` — LiteLLM configuration (JSON)
 
 Each successful run also creates a git tag: `vYYYY-MM-DD-HHMMSS`
 
