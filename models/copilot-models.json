@@ -251,6 +251,10 @@
       "model_picker_enabled": true,
       "name": "GPT-5.4 mini",
       "object": "model",
+      "policy": {
+        "state": "enabled",
+        "terms": "Enable access to the latest GPT-5.4 mini model from OpenAI. [Learn more about how GitHub Copilot serves GPT-5.4 mini](https://gh.io/copilot-openai)."
+      },
       "preview": false,
       "supported_endpoints": [
         "/responses",
@@ -1182,6 +1186,6 @@
     }
   ],
   "object": "list",
-  "fetched_at": "2026-05-07T00:14:23.384089",
+  "fetched_at": "2026-05-08T00:14:51.677904",
   "total": 32
 }
