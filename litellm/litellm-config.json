@@ -467,34 +467,6 @@
       }
     },
     {
-      "model_name": "grok-code-fast-1",
-      "litellm_params": {
-        "model": "github/grok-code-fast-1",
-        "api_key": "os.environ/GITHUB_TOKEN"
-      },
-      "model_info": {
-        "id": "grok-code-fast-1",
-        "name": "Grok Code Fast 1",
-        "capabilities": {
-          "family": "grok-code",
-          "limits": {
-            "max_context_window_tokens": 128000,
-            "max_output_tokens": 64000,
-            "max_prompt_tokens": 128000
-          },
-          "object": "model_capabilities",
-          "supports": {
-            "streaming": true,
-            "structured_outputs": true,
-            "tool_calls": true
-          },
-          "tokenizer": "o200k_base",
-          "type": "chat"
-        },
-        "version": "grok-code-fast-1"
-      }
-    },
-    {
       "model_name": "text-embedding-3-small",
       "litellm_params": {
         "model": "github/text-embedding-3-small",
@@ -1034,33 +1006,6 @@
       }
     },
     {
-      "model_name": "gpt-4",
-      "litellm_params": {
-        "model": "github/gpt-4",
-        "api_key": "os.environ/GITHUB_TOKEN"
-      },
-      "model_info": {
-        "id": "gpt-4",
-        "name": "GPT 4",
-        "capabilities": {
-          "family": "gpt-4",
-          "limits": {
-            "max_context_window_tokens": 32768,
-            "max_output_tokens": 4096,
-            "max_prompt_tokens": 32768
-          },
-          "object": "model_capabilities",
-          "supports": {
-            "streaming": true,
-            "tool_calls": true
-          },
-          "tokenizer": "cl100k_base",
-          "type": "chat"
-        },
-        "version": "gpt-4-0613"
-      }
-    },
-    {
       "model_name": "gpt-4o",
       "litellm_params": {
         "model": "github/gpt-4o",
@@ -1097,34 +1042,6 @@
           "type": "chat"
         },
         "version": "gpt-4o-2024-11-20"
-      }
-    },
-    {
-      "model_name": "gpt-4-o-preview",
-      "litellm_params": {
-        "model": "github/gpt-4-o-preview",
-        "api_key": "os.environ/GITHUB_TOKEN"
-      },
-      "model_info": {
-        "id": "gpt-4-o-preview",
-        "name": "GPT-4o",
-        "capabilities": {
-          "family": "gpt-4o",
-          "limits": {
-            "max_context_window_tokens": 128000,
-            "max_output_tokens": 4096,
-            "max_prompt_tokens": 64000
-          },
-          "object": "model_capabilities",
-          "supports": {
-            "parallel_tool_calls": true,
-            "streaming": true,
-            "tool_calls": true
-          },
-          "tokenizer": "o200k_base",
-          "type": "chat"
-        },
-        "version": "gpt-4o-2024-05-13"
       }
     },
     {
