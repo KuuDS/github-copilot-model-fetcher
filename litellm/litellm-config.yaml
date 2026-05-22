@@ -20,6 +20,7 @@ model_list:
           - image/jpeg
           - image/png
           - image/webp
+          - image/gif
       object: model_capabilities
       supports:
         adaptive_thinking: true
@@ -56,6 +57,7 @@ model_list:
           - image/jpeg
           - image/png
           - image/webp
+          - image/gif
       object: model_capabilities
       supports:
         adaptive_thinking: true

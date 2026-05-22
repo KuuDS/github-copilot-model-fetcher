@@ -14,7 +14,8 @@
             "supported_media_types": [
               "image/jpeg",
               "image/png",
-              "image/webp"
+              "image/webp",
+              "image/gif"
             ]
           }
         },
@@ -66,7 +67,8 @@
             "supported_media_types": [
               "image/jpeg",
               "image/png",
-              "image/webp"
+              "image/webp",
+              "image/gif"
             ]
           }
         },
@@ -1074,8 +1076,7 @@
         "type": "chat"
       },
       "id": "gpt-4o",
-      "model_picker_category": "versatile",
-      "model_picker_enabled": true,
+      "model_picker_enabled": false,
       "name": "GPT-4o",
       "object": "model",
       "preview": false,
@@ -1103,6 +1104,6 @@
     }
   ],
   "object": "list",
-  "fetched_at": "2026-05-21T00:20:55.148515",
+  "fetched_at": "2026-05-22T00:19:08.413761",
   "total": 29
 }

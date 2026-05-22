@@ -22,7 +22,8 @@
               "supported_media_types": [
                 "image/jpeg",
                 "image/png",
-                "image/webp"
+                "image/webp",
+                "image/gif"
               ]
             }
           },
@@ -68,7 +69,8 @@
               "supported_media_types": [
                 "image/jpeg",
                 "image/png",
-                "image/webp"
+                "image/webp",
+                "image/gif"
               ]
             }
           },
