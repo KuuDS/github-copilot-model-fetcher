@@ -12,10 +12,10 @@
         "capabilities": {
           "family": "claude-opus-4.7",
           "limits": {
-            "max_context_window_tokens": 144000,
+            "max_context_window_tokens": 264000,
             "max_non_streaming_output_tokens": 16000,
             "max_output_tokens": 64000,
-            "max_prompt_tokens": 128000,
+            "max_prompt_tokens": 200000,
             "vision": {
               "max_prompt_image_size": 3145728,
               "max_prompt_images": 1,
