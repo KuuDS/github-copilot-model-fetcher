@@ -58,6 +58,7 @@
         "family": "claude-opus-4.8",
         "limits": {
           "max_context_window_tokens": 200000,
+          "max_non_streaming_output_tokens": 16000,
           "max_output_tokens": 64000,
           "max_prompt_tokens": 168000,
           "vision": {
@@ -1156,6 +1157,6 @@
     }
   ],
   "object": "list",
-  "fetched_at": "2026-05-29T00:22:03.094282",
+  "fetched_at": "2026-05-30T00:19:54.925317",
   "total": 30
 }

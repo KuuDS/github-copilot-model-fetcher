@@ -60,6 +60,7 @@
           "family": "claude-opus-4.8",
           "limits": {
             "max_context_window_tokens": 200000,
+            "max_non_streaming_output_tokens": 16000,
             "max_output_tokens": 64000,
             "max_prompt_tokens": 168000,
             "vision": {
