@@ -1040,7 +1040,7 @@
       },
       "id": "gpt-4.1",
       "model_picker_category": "versatile",
-      "model_picker_enabled": true,
+      "model_picker_enabled": false,
       "name": "GPT-4.1",
       "object": "model",
       "policy": {
@@ -1157,6 +1157,6 @@
     }
   ],
   "object": "list",
-  "fetched_at": "2026-05-31T00:19:06.934939",
+  "fetched_at": "2026-06-01T00:19:08.798692",
   "total": 30
 }
