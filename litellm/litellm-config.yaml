@@ -28,7 +28,11 @@ model_list:
         min_thinking_budget: 1024
         parallel_tool_calls: true
         reasoning_effort:
+        - low
         - medium
+        - high
+        - xhigh
+        - max
         streaming: true
         structured_outputs: true
         tool_calls: true
@@ -46,10 +50,10 @@ model_list:
     capabilities:
       family: claude-opus-4.8
       limits:
-        max_context_window_tokens: 200000
+        max_context_window_tokens: 264000
         max_non_streaming_output_tokens: 16000
         max_output_tokens: 64000
-        max_prompt_tokens: 168000
+        max_prompt_tokens: 200000
         vision:
           max_prompt_image_size: 3145728
           max_prompt_images: 1
@@ -65,7 +69,11 @@ model_list:
         min_thinking_budget: 1024
         parallel_tool_calls: true
         reasoning_effort:
+        - low
         - medium
+        - high
+        - xhigh
+        - max
         streaming: true
         structured_outputs: true
         tool_calls: true
@@ -83,10 +91,10 @@ model_list:
     capabilities:
       family: claude-sonnet-4.6
       limits:
-        max_context_window_tokens: 200000
+        max_context_window_tokens: 264000
         max_non_streaming_output_tokens: 16000
-        max_output_tokens: 32000
-        max_prompt_tokens: 128000
+        max_output_tokens: 64000
+        max_prompt_tokens: 200000
         vision:
           max_prompt_image_size: 3145728
           max_prompt_images: 5
@@ -105,6 +113,7 @@ model_list:
         - low
         - medium
         - high
+        - max
         streaming: true
         structured_outputs: true
         tool_calls: true
@@ -122,9 +131,9 @@ model_list:
     capabilities:
       family: gemini-3.1-pro-preview
       limits:
-        max_context_window_tokens: 128000
+        max_context_window_tokens: 264000
         max_output_tokens: 64000
-        max_prompt_tokens: 128000
+        max_prompt_tokens: 200000
         vision:
           max_prompt_image_size: 3145728
           max_prompt_images: 10
@@ -159,9 +168,9 @@ model_list:
     capabilities:
       family: gemini-3.5-flash
       limits:
-        max_context_window_tokens: 200000
+        max_context_window_tokens: 264000
         max_output_tokens: 64000
-        max_prompt_tokens: 128000
+        max_prompt_tokens: 200000
         vision:
           max_prompt_image_size: 3145728
           max_prompt_images: 10
@@ -177,6 +186,7 @@ model_list:
         min_thinking_budget: 256
         parallel_tool_calls: true
         reasoning_effort:
+        - minimal
         - low
         - medium
         - high
@@ -320,6 +330,7 @@ model_list:
       supports:
         parallel_tool_calls: true
         reasoning_effort:
+        - none
         - low
         - medium
         - high
