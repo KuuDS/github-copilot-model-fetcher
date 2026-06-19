@@ -15,7 +15,8 @@
               "image/jpeg",
               "image/png",
               "image/webp",
-              "image/gif"
+              "image/gif",
+              "application/pdf"
             ]
           }
         },
@@ -72,7 +73,8 @@
               "image/jpeg",
               "image/png",
               "image/webp",
-              "image/gif"
+              "image/gif",
+              "application/pdf"
             ]
           }
         },
@@ -129,7 +131,8 @@
               "image/jpeg",
               "image/png",
               "image/webp",
-              "image/gif"
+              "image/gif",
+              "application/pdf"
             ]
           }
         },
@@ -185,7 +188,8 @@
               "image/png",
               "image/webp",
               "image/heic",
-              "image/heif"
+              "image/heif",
+              "application/pdf"
             ]
           }
         },
@@ -237,7 +241,8 @@
               "image/png",
               "image/webp",
               "image/heic",
-              "image/heif"
+              "image/heif",
+              "application/pdf"
             ]
           }
         },
@@ -289,7 +294,8 @@
               "image/jpeg",
               "image/png",
               "image/webp",
-              "image/gif"
+              "image/gif",
+              "application/pdf"
             ]
           }
         },
@@ -337,7 +343,8 @@
               "image/jpeg",
               "image/png",
               "image/webp",
-              "image/gif"
+              "image/gif",
+              "application/pdf"
             ]
           }
         },
@@ -390,7 +397,8 @@
               "image/jpeg",
               "image/png",
               "image/webp",
-              "image/gif"
+              "image/gif",
+              "application/pdf"
             ]
           }
         },
@@ -444,7 +452,8 @@
               "image/jpeg",
               "image/png",
               "image/webp",
-              "image/gif"
+              "image/gif",
+              "application/pdf"
             ]
           }
         },
@@ -497,7 +506,8 @@
               "image/jpeg",
               "image/png",
               "image/webp",
-              "image/gif"
+              "image/gif",
+              "application/pdf"
             ]
           }
         },
@@ -663,7 +673,8 @@
             "supported_media_types": [
               "image/jpeg",
               "image/png",
-              "image/webp"
+              "image/webp",
+              "application/pdf"
             ]
           }
         },
@@ -710,7 +721,8 @@
             "supported_media_types": [
               "image/jpeg",
               "image/png",
-              "image/webp"
+              "image/webp",
+              "application/pdf"
             ]
           }
         },
@@ -757,7 +769,8 @@
             "supported_media_types": [
               "image/jpeg",
               "image/png",
-              "image/webp"
+              "image/webp",
+              "application/pdf"
             ]
           }
         },
@@ -805,7 +818,8 @@
               "image/png",
               "image/webp",
               "image/heic",
-              "image/heif"
+              "image/heif",
+              "application/pdf"
             ]
           }
         },
@@ -848,7 +862,8 @@
               "image/jpeg",
               "image/png",
               "image/webp",
-              "image/gif"
+              "image/gif",
+              "application/pdf"
             ]
           }
         },
@@ -961,7 +976,8 @@
               "image/jpeg",
               "image/png",
               "image/webp",
-              "image/gif"
+              "image/gif",
+              "application/pdf"
             ]
           }
         },
@@ -1022,7 +1038,8 @@
               "image/jpeg",
               "image/png",
               "image/webp",
-              "image/gif"
+              "image/gif",
+              "application/pdf"
             ]
           }
         },
@@ -1156,6 +1173,6 @@
     }
   ],
   "object": "list",
-  "fetched_at": "2026-06-18T00:26:18.200736",
+  "fetched_at": "2026-06-19T00:29:10.199047",
   "total": 30
 }

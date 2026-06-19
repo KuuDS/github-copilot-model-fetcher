@@ -21,6 +21,7 @@ model_list:
           - image/png
           - image/webp
           - image/gif
+          - application/pdf
       object: model_capabilities
       supports:
         adaptive_thinking: true
@@ -62,6 +63,7 @@ model_list:
           - image/png
           - image/webp
           - image/gif
+          - application/pdf
       object: model_capabilities
       supports:
         adaptive_thinking: true
@@ -103,6 +105,7 @@ model_list:
           - image/png
           - image/webp
           - image/gif
+          - application/pdf
       object: model_capabilities
       supports:
         adaptive_thinking: true
@@ -143,6 +146,7 @@ model_list:
           - image/webp
           - image/heic
           - image/heif
+          - application/pdf
       object: model_capabilities
       supports:
         max_thinking_budget: 32000
@@ -180,6 +184,7 @@ model_list:
           - image/webp
           - image/heic
           - image/heif
+          - application/pdf
       object: model_capabilities
       supports:
         max_thinking_budget: 24000
@@ -217,6 +222,7 @@ model_list:
           - image/png
           - image/webp
           - image/gif
+          - application/pdf
       object: model_capabilities
       supports:
         parallel_tool_calls: true
@@ -253,6 +259,7 @@ model_list:
           - image/png
           - image/webp
           - image/gif
+          - application/pdf
       object: model_capabilities
       supports:
         parallel_tool_calls: true
@@ -290,6 +297,7 @@ model_list:
           - image/png
           - image/webp
           - image/gif
+          - application/pdf
       object: model_capabilities
       supports:
         parallel_tool_calls: true
@@ -327,6 +335,7 @@ model_list:
           - image/png
           - image/webp
           - image/gif
+          - application/pdf
       object: model_capabilities
       supports:
         parallel_tool_calls: true
@@ -364,6 +373,7 @@ model_list:
           - image/png
           - image/webp
           - image/gif
+          - application/pdf
       object: model_capabilities
       supports:
         parallel_tool_calls: true
@@ -494,6 +504,7 @@ model_list:
           - image/jpeg
           - image/png
           - image/webp
+          - application/pdf
       object: model_capabilities
       supports:
         max_thinking_budget: 32000
@@ -526,6 +537,7 @@ model_list:
           - image/jpeg
           - image/png
           - image/webp
+          - application/pdf
       object: model_capabilities
       supports:
         max_thinking_budget: 32000
@@ -558,6 +570,7 @@ model_list:
           - image/jpeg
           - image/png
           - image/webp
+          - application/pdf
       object: model_capabilities
       supports:
         max_thinking_budget: 32000
@@ -591,6 +604,7 @@ model_list:
           - image/webp
           - image/heic
           - image/heif
+          - application/pdf
       object: model_capabilities
       supports:
         max_thinking_budget: 32768
@@ -623,6 +637,7 @@ model_list:
           - image/png
           - image/webp
           - image/gif
+          - application/pdf
       object: model_capabilities
       supports:
         parallel_tool_calls: true
@@ -714,6 +729,7 @@ model_list:
           - image/png
           - image/webp
           - image/gif
+          - application/pdf
       object: model_capabilities
       supports:
         parallel_tool_calls: true
@@ -765,6 +781,7 @@ model_list:
           - image/png
           - image/webp
           - image/gif
+          - application/pdf
       object: model_capabilities
       supports:
         parallel_tool_calls: true

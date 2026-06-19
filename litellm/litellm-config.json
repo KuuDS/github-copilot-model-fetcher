@@ -23,7 +23,8 @@
                 "image/jpeg",
                 "image/png",
                 "image/webp",
-                "image/gif"
+                "image/gif",
+                "application/pdf"
               ]
             }
           },
@@ -74,7 +75,8 @@
                 "image/jpeg",
                 "image/png",
                 "image/webp",
-                "image/gif"
+                "image/gif",
+                "application/pdf"
               ]
             }
           },
@@ -125,7 +127,8 @@
                 "image/jpeg",
                 "image/png",
                 "image/webp",
-                "image/gif"
+                "image/gif",
+                "application/pdf"
               ]
             }
           },
@@ -175,7 +178,8 @@
                 "image/png",
                 "image/webp",
                 "image/heic",
-                "image/heif"
+                "image/heif",
+                "application/pdf"
               ]
             }
           },
@@ -222,7 +226,8 @@
                 "image/png",
                 "image/webp",
                 "image/heic",
-                "image/heif"
+                "image/heif",
+                "application/pdf"
               ]
             }
           },
@@ -269,7 +274,8 @@
                 "image/jpeg",
                 "image/png",
                 "image/webp",
-                "image/gif"
+                "image/gif",
+                "application/pdf"
               ]
             }
           },
@@ -315,7 +321,8 @@
                 "image/jpeg",
                 "image/png",
                 "image/webp",
-                "image/gif"
+                "image/gif",
+                "application/pdf"
               ]
             }
           },
@@ -362,7 +369,8 @@
                 "image/jpeg",
                 "image/png",
                 "image/webp",
-                "image/gif"
+                "image/gif",
+                "application/pdf"
               ]
             }
           },
@@ -409,7 +417,8 @@
                 "image/jpeg",
                 "image/png",
                 "image/webp",
-                "image/gif"
+                "image/gif",
+                "application/pdf"
               ]
             }
           },
@@ -456,7 +465,8 @@
                 "image/jpeg",
                 "image/png",
                 "image/webp",
-                "image/gif"
+                "image/gif",
+                "application/pdf"
               ]
             }
           },
@@ -630,7 +640,8 @@
               "supported_media_types": [
                 "image/jpeg",
                 "image/png",
-                "image/webp"
+                "image/webp",
+                "application/pdf"
               ]
             }
           },
@@ -671,7 +682,8 @@
               "supported_media_types": [
                 "image/jpeg",
                 "image/png",
-                "image/webp"
+                "image/webp",
+                "application/pdf"
               ]
             }
           },
@@ -712,7 +724,8 @@
               "supported_media_types": [
                 "image/jpeg",
                 "image/png",
-                "image/webp"
+                "image/webp",
+                "application/pdf"
               ]
             }
           },
@@ -754,7 +767,8 @@
                 "image/png",
                 "image/webp",
                 "image/heic",
-                "image/heif"
+                "image/heif",
+                "application/pdf"
               ]
             }
           },
@@ -795,7 +809,8 @@
                 "image/jpeg",
                 "image/png",
                 "image/webp",
-                "image/gif"
+                "image/gif",
+                "application/pdf"
               ]
             }
           },
@@ -916,7 +931,8 @@
                 "image/jpeg",
                 "image/png",
                 "image/webp",
-                "image/gif"
+                "image/gif",
+                "application/pdf"
               ]
             }
           },
@@ -983,7 +999,8 @@
                 "image/jpeg",
                 "image/png",
                 "image/webp",
-                "image/gif"
+                "image/gif",
+                "application/pdf"
               ]
             }
           },
