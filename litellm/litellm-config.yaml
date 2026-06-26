@@ -124,6 +124,83 @@ model_list:
       tokenizer: o200k_base
       type: chat
     version: claude-sonnet-4.6
+- model_name: gemini-3.1-pro-preview
+  litellm_params:
+    model: github/gemini-3.1-pro-preview
+    api_key: os.environ/GITHUB_TOKEN
+  model_info:
+    id: gemini-3.1-pro-preview
+    name: Gemini 3.1 Pro
+    capabilities:
+      family: gemini-3.1-pro-preview
+      limits:
+        max_context_window_tokens: 264000
+        max_output_tokens: 64000
+        max_prompt_tokens: 200000
+        vision:
+          max_prompt_image_size: 3145728
+          max_prompt_images: 10
+          supported_media_types:
+          - image/jpeg
+          - image/png
+          - image/webp
+          - image/heic
+          - image/heif
+          - application/pdf
+      object: model_capabilities
+      supports:
+        max_thinking_budget: 32000
+        min_thinking_budget: 256
+        parallel_tool_calls: true
+        reasoning_effort:
+        - low
+        - medium
+        - high
+        streaming: true
+        tool_calls: true
+        vision: true
+      tokenizer: o200k_base
+      type: chat
+    version: gemini-3.1-pro-preview
+- model_name: gemini-3.5-flash
+  litellm_params:
+    model: github/gemini-3.5-flash
+    api_key: os.environ/GITHUB_TOKEN
+  model_info:
+    id: gemini-3.5-flash
+    name: Gemini 3.5 Flash
+    capabilities:
+      family: gemini-3.5-flash
+      limits:
+        max_context_window_tokens: 264000
+        max_output_tokens: 64000
+        max_prompt_tokens: 200000
+        vision:
+          max_prompt_image_size: 3145728
+          max_prompt_images: 10
+          supported_media_types:
+          - image/jpeg
+          - image/png
+          - image/webp
+          - image/heic
+          - image/heif
+          - application/pdf
+      object: model_capabilities
+      supports:
+        max_thinking_budget: 24000
+        min_thinking_budget: 256
+        parallel_tool_calls: true
+        reasoning_effort:
+        - minimal
+        - low
+        - medium
+        - high
+        streaming: true
+        tool_calls: true
+        vision: true
+      tokenizer: o200k_base
+      type: chat
+    version: gemini-3.5-flash
 - model_name: gpt-5.3-codex
   litellm_params:
     model: github/gpt-5.3-codex
@@ -275,6 +352,32 @@ model_list:
       tokenizer: o200k_base
       type: chat
     version: gpt-5.5
+- model_name: mai-code-1-flash-picker
+  litellm_params:
+    model: github/mai-code-1-flash-picker
+    api_key: os.environ/GITHUB_TOKEN
+  model_info:
+    id: mai-code-1-flash-picker
+    name: MAI-Code-1-Flash
+    capabilities:
+      family: oswe-vscode-modelD
+      limits:
+        max_context_window_tokens: 256000
+        max_output_tokens: 128000
+        max_prompt_tokens: 128000
+      object: model_capabilities
+      supports:
+        parallel_tool_calls: true
+        reasoning_effort:
+        - low
+        - medium
+        - high
+        streaming: true
+        structured_outputs: true
+        tool_calls: true
+      tokenizer: o200k_base
+      type: chat
+    version: mai-code-1-flash-picker
 - model_name: gpt-5-mini
   litellm_params:
     model: github/gpt-5-mini
