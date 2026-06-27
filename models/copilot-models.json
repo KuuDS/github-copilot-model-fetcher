@@ -175,113 +175,6 @@
     },
     {
       "capabilities": {
-        "family": "gemini-3.1-pro-preview",
-        "limits": {
-          "max_context_window_tokens": 264000,
-          "max_output_tokens": 64000,
-          "max_prompt_tokens": 200000,
-          "vision": {
-            "max_prompt_image_size": 3145728,
-            "max_prompt_images": 10,
-            "supported_media_types": [
-              "image/jpeg",
-              "image/png",
-              "image/webp",
-              "image/heic",
-              "image/heif",
-              "application/pdf"
-            ]
-          }
-        },
-        "object": "model_capabilities",
-        "supports": {
-          "max_thinking_budget": 32000,
-          "min_thinking_budget": 256,
-          "parallel_tool_calls": true,
-          "reasoning_effort": [
-            "low",
-            "medium",
-            "high"
-          ],
-          "streaming": true,
-          "tool_calls": true,
-          "vision": true
-        },
-        "tokenizer": "o200k_base",
-        "type": "chat"
-      },
-      "id": "gemini-3.1-pro-preview",
-      "model_picker_category": "powerful",
-      "model_picker_enabled": true,
-      "name": "Gemini 3.1 Pro",
-      "object": "model",
-      "policy": {
-        "state": "enabled",
-        "terms": "Enable access to the latest Gemini 3 Pro model from Google. [Learn more about how GitHub Copilot serves Gemini 3 Pro](https://docs.github.com/en/copilot/reference/ai-models/model-hosting#google-models)."
-      },
-      "preview": true,
-      "supported_endpoints": [
-        "/chat/completions"
-      ],
-      "vendor": "Google",
-      "version": "gemini-3.1-pro-preview"
-    },
-    {
-      "capabilities": {
-        "family": "gemini-3.5-flash",
-        "limits": {
-          "max_context_window_tokens": 264000,
-          "max_output_tokens": 64000,
-          "max_prompt_tokens": 200000,
-          "vision": {
-            "max_prompt_image_size": 3145728,
-            "max_prompt_images": 10,
-            "supported_media_types": [
-              "image/jpeg",
-              "image/png",
-              "image/webp",
-              "image/heic",
-              "image/heif",
-              "application/pdf"
-            ]
-          }
-        },
-        "object": "model_capabilities",
-        "supports": {
-          "max_thinking_budget": 24000,
-          "min_thinking_budget": 256,
-          "parallel_tool_calls": true,
-          "reasoning_effort": [
-            "minimal",
-            "low",
-            "medium",
-            "high"
-          ],
-          "streaming": true,
-          "tool_calls": true,
-          "vision": true
-        },
-        "tokenizer": "o200k_base",
-        "type": "chat"
-      },
-      "id": "gemini-3.5-flash",
-      "model_picker_category": "lightweight",
-      "model_picker_enabled": true,
-      "name": "Gemini 3.5 Flash",
-      "object": "model",
-      "policy": {
-        "state": "enabled",
-        "terms": "Enable access to the latest Gemini 3.5 Flash model from Google. [Learn more about how GitHub Copilot serves Gemini 3.5 Flash](https://docs.github.com/en/copilot/reference/ai-models/model-hosting#google-models)."
-      },
-      "preview": false,
-      "supported_endpoints": [
-        "/chat/completions"
-      ],
-      "vendor": "Google",
-      "version": "gemini-3.5-flash"
-    },
-    {
-      "capabilities": {
         "family": "gpt-5.3-codex",
         "limits": {
           "max_context_window_tokens": 400000,
@@ -491,45 +384,6 @@
       ],
       "vendor": "OpenAI",
       "version": "gpt-5.5"
-    },
-    {
-      "capabilities": {
-        "family": "oswe-vscode-modelD",
-        "limits": {
-          "max_context_window_tokens": 256000,
-          "max_output_tokens": 128000,
-          "max_prompt_tokens": 128000
-        },
-        "object": "model_capabilities",
-        "supports": {
-          "parallel_tool_calls": true,
-          "reasoning_effort": [
-            "low",
-            "medium",
-            "high"
-          ],
-          "streaming": true,
-          "structured_outputs": true,
-          "tool_calls": true
-        },
-        "tokenizer": "o200k_base",
-        "type": "chat"
-      },
-      "id": "mai-code-1-flash-picker",
-      "model_picker_category": "versatile",
-      "model_picker_enabled": true,
-      "name": "MAI-Code-1-Flash",
-      "object": "model",
-      "policy": {
-        "state": "enabled",
-        "terms": ""
-      },
-      "preview": false,
-      "supported_endpoints": [
-        "/responses"
-      ],
-      "vendor": "Microsoft",
-      "version": "mai-code-1-flash-picker"
     },
     {
       "capabilities": {
@@ -1212,6 +1066,6 @@
     }
   ],
   "object": "list",
-  "fetched_at": "2026-06-26T00:23:22.710155",
-  "total": 31
+  "fetched_at": "2026-06-27T00:21:30.280778",
+  "total": 28
 }
